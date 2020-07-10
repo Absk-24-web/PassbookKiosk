@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -146,14 +147,14 @@ class Log
 
            File myFile = new File("C:\\Kiosk_test\\"+folder+"\\"+ folder+"_"+ date.format(dateparse) + ".txt");
 
-           if (myFile.createNewFile())
-           {
+//           if (myFile.createNewFile())
+//           {
 //				 System.out.println("File is created!");
-           }
-           else
-           {
+//           }
+//           else
+//           {
 //				 System.out.println("File already exists.");
-           }
+//           }
            DateFormat timeparse = new SimpleDateFormat("HH:mm:ss");
            Date time = new Date();
 
@@ -171,6 +172,61 @@ class Log
        }
 
    }
+
+    public static void WriteMISData(String strSTAN, String strAccNo, String strLTP, String strResult)
+    {
+        try
+        {
+            DateFormat date = new SimpleDateFormat("dd-MM-yyyy");
+            Date dateparse = new Date();
+
+            String Path = "C:\\Kiosk_test\\MISData";
+            File dir = new File(Path);
+
+            if (!dir.exists())
+            {
+                if (dir.mkdirs())
+                {
+                    Log.Write("ClientLogs Log Directory Is Created Successfully!");
+                }
+                else
+                {
+                    Log.Write("ClientLogs Failed to create multiple directories!");
+                }
+            }
+
+            File myFile = new File("C:\\Kiosk_test\\MISData\\MISData_"+ date.format(dateparse) + ".txt");
+
+           if (myFile.createNewFile())
+           {
+				 System.out.println("File is created!");
+           }
+           else
+           {
+				 System.out.println("File already exists.");
+           }
+            DateFormat timeparse = new SimpleDateFormat("HH:mm:ss");
+            Date time = new Date();
+
+             String str = timeparse.format(time) + ":- " +"Stan:- "+ strSTAN +" AccNo.:- "+ strAccNo+" LTP:- "+strLTP+" Result:-"+strResult+ "\n";
+
+
+            // File file = new File(Path);
+            FileWriter fr = null;
+            fr = new FileWriter(myFile, true);
+            fr.write(str);
+            fr.close();
+
+
+        }
+        catch (Exception excp)
+        {
+            Log.Write("Exception in MISData:-"+excp.getMessage());
+        }
+    }
+
+
+
 //    public static void Write(String LogData, String fields) {
 //        try
 //        {

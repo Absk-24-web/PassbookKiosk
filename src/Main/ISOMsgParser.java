@@ -1,5 +1,7 @@
 package Main;
 
+import com.sun.org.apache.bcel.internal.generic.GotoInstruction;
+
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -88,7 +90,7 @@ public class ISOMsgParser {
     }
 
 
-    public static boolean FilterISO8583ResponseMessage(  )
+    public static boolean FilterISO8583ResponseMessage()
     {
         try
         {
@@ -167,7 +169,7 @@ public class ISOMsgParser {
                         }
                         else
                         {
-                            Log.Write("Field " + (iField + 1) + " (FIXED) data is not proper, its length should be " + GlobalMembers.objISO[iField + 1].iLength + " bytes");
+                            GlobalMembers.strErrorMsg = ("Field " + (iField + 1) + " (FIXED) data is not proper, its length should be " + GlobalMembers.objISO[iField + 1].iLength + " bytes");
                             return false;
                         }
                     }
@@ -177,7 +179,7 @@ public class ISOMsgParser {
                         int a = Integer.toString(GlobalMembers.objISO[iField + 1].iLength).length();
                         if (!isNumber(strMsgFields.substring(0,a)))
                         {
-                            Log.Write("Field " + (iField + 1) + " (VARIABLE) length data is not proper, its length data should be " + GlobalMembers.objISO[iField + 1].iLength + " bytes");
+                            GlobalMembers.strErrorMsg = ("Field " + (iField + 1) + " (VARIABLE) length data is not proper, its length data should be " + GlobalMembers.objISO[iField + 1].iLength + " bytes");
                             return false;
                         }
 
@@ -196,7 +198,7 @@ public class ISOMsgParser {
                         }
                         else
                         {
-                            Log.Write("Field"+(iField)+"(VARIABLE) data is not proper, its length should be"+iLen+"bytes");
+                            GlobalMembers.strErrorMsg = ("Field"+(iField)+"(VARIABLE) data is not proper, its length should be"+iLen+"bytes");
                             return false;
                         }
                     }
@@ -206,7 +208,7 @@ public class ISOMsgParser {
         }
         catch (Exception excp)
         {
-            Log.Write("Exception in filter:-" +excp.getMessage());
+            GlobalMembers.strErrorMsg = ("Exception in filter:-" +excp.getMessage());
             return false;
         }
         finally
@@ -242,7 +244,7 @@ public class ISOMsgParser {
                             strReplyMsg +=  GlobalMembers.objISO[iField + 1].strValue;
                         else
                         {
-                            Log.Write("ISO Field " + (iField + 1) + "data is not proper, its length should be " +  GlobalMembers.objISO[iField + 1].iLength + " bytes");
+                            GlobalMembers.strErrorMsg = "ISO Field " + (iField + 1) + "data is not proper, its length should be " + GlobalMembers.objISO[iField + 1].iLength + " bytes";
                             return false;
                         }
                     }
@@ -262,7 +264,7 @@ public class ISOMsgParser {
                             }
                             else
                             {
-//                                strErrorMsg = "ISO Field " + (iField + 1)+ "data is not proper, its maximum length could be " +  GlobalMembers.objISO[iField + 1].iLength + " bytes";
+                                GlobalMembers.strErrorMsg = "ISO Field " + (iField + 1) + "data is not proper, its maximum length could be " + GlobalMembers.objISO[iField + 1].iLength + " bytes";
                                 return false;
                             }
                         }
@@ -323,7 +325,7 @@ public class ISOMsgParser {
             {
                 if ( GlobalMembers.usISOHeaderLength !=  GlobalMembers.strDefISOHeader.length())
                 {
-                    Log.Write("ISO Header length is not proper");
+                    GlobalMembers.strErrorMsg = "ISO Header length is not proper";
                     return false;
                 }
 
@@ -335,7 +337,7 @@ public class ISOMsgParser {
 
             if ( GlobalMembers.strDefMTI.length()!=  GlobalMembers.usMTILength)
             {
-                 Log.Write("MTI length is not proper");
+                GlobalMembers.strErrorMsg = "MTI length is not proper";
                 return false;
             }
 
@@ -375,8 +377,7 @@ public class ISOMsgParser {
         }
         catch (Exception excp)
         {
-            excp.printStackTrace();
-//            strErrorMsg = excp.getMessage();
+            GlobalMembers.strErrorMsg = excp.getMessage();
             return false;
         }
         finally

@@ -21,7 +21,6 @@ public class Main extends JFrame {
     public static String dirPath;
     private static Dimension screenSize;
     public static  int AppInitCount = 0;
-    public static Socket client;
     public static ImageIcon image;
 
     static {
@@ -613,7 +612,7 @@ public class Main extends JFrame {
                 {
                     //To do for dns handling
                     Log.Write("CONNECTION VIA TCP/IP");
-                    if (client == null)
+                    if (GlobalMembers.client == null)
                     {
                         //Added[12Sept2013] To resolve DNS and to get IP
                         if (GlobalMembers.objCBS.bIs_DNS)
@@ -626,7 +625,7 @@ public class Main extends JFrame {
                         else
                         {
 //                            client = ScsClientFactory.CreateClient(new ScsTcpEndPoint(GlobalMembers.objCBS.strIP, Convert.ToInt32(GlobalMembers.objCBS.strPort)));
-                            client = new Socket(GlobalMembers.objCBS.strIP,Integer.parseInt(GlobalMembers.objCBS.strPort));
+                            GlobalMembers.client = new Socket(GlobalMembers.objCBS.strIP,Integer.parseInt(GlobalMembers.objCBS.strPort));
                             Log.Write("CONNECTION VIA TCP/IP AND DNS IS NOT ENABLED");
                         }
 

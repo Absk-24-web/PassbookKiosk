@@ -116,10 +116,17 @@ public static void main(String[] args) {
 //    }
 
 
-        int[] source = { 1, 2, 3, 4, 5, 6, 7 };
-        int[] destination = new int[source.length];
-        System.arraycopy(source, 2, destination, 0, source.length-2);
-        System.out.println(Arrays.toString(destination));
+//        int[] source = { 1, 2, 3, 4, 5, 6, 7 };
+//        int[] destination = new int[source.length];
+//        System.arraycopy(source, 2, destination, 0, source.length-2);
+//        System.out.println(Arrays.toString(destination));
+
+    //left pading
+//    String result = String.format("%9s", "str").replace(' ','0');
+    //right pading
+    String result = String.format("%9s", "str");
+    System.out.println(result);
+
 
 
 }

@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.Socket;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -61,6 +62,10 @@ public  class GlobalMembers {
     public static boolean bIsNewTransaction;
     public static Task objTaskState;
     public static Timer objTimer=null;
+    public static int errorCode;
+
+    //client
+    public static Socket client;
 
 
 
@@ -134,6 +139,7 @@ public  class GlobalMembers {
     public static int iLineSpacingForThread = 0;
     public static int iTxnsBeforeThreadSpace;
     public static int iThreadforIndexing = 0;
+    public static String strErrorMsg = "";
 
     //Lokesh Added
     public static int strPBHeight;
@@ -653,36 +659,7 @@ public  class GlobalMembers {
     /// <param name="strAccNo">Account number for the transaction session</param>
     /// <param name="strLTP">Lines to print</param>
     /// <param name="strResult">Result tof the transaction session</param>
-    public static void WriteMISData(String strSTAN, String strAccNo, String strLTP, String strResult)
-    {
-        try
-        {
-            //if object istantiated
-            if (MISQueue != null)
-            {
-                //create local object of log structure
-                MISStructure objMISStructure = new MISStructure();
 
-                //assign data
-                objMISStructure.strSTAN = strSTAN;
-                objMISStructure.strAccNo = strAccNo;
-                //objMISStructure.strLTP = strLTP;
-                objMISStructure.strLTP = (Integer.toString(Integer.parseInt(strLTP))+1);
-                objMISStructure.strResult = strResult;
-                objMISStructure.dtLogTime = LocalDateTime.now();
-
-                //add object in queue
-                MISQueue.add(objMISStructure);
-
-                //notify thread about inserted object
-//                queueNotifierMIS.Set();
-            }
-        }
-        catch (Exception excp)
-        {
-            Log.Write("Exception in MISData:-"+excp.getMessage());
-        }
-    }
 
     public static void ResetISOFields() {
 //        //Shubhit
