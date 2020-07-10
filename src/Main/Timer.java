@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
+import static Main.GlobalMembers.DisplayImageOnForm;
 import static Main.GlobalMembers.objLksdbIni;
 
 public class Timer implements Runnable {
@@ -22,8 +23,9 @@ public class Timer implements Runnable {
     private boolean bTransactionDataReceived;
     private boolean bIsCheckingBCOrientation = false;
     private static final String dirPath;
-   static {
-    dirPath = System.getProperty("user.dir");
+
+        static {
+            dirPath = System.getProperty("user.dir");
         }
     
     @Override
@@ -44,8 +46,6 @@ public class Timer implements Runnable {
                         try {
                             GlobalMembers.bThreadProtection = true;
                             iMsgType = 0;
-
-                            GlobalMembers.objClientConfigIni.put("Kiosk_Details", "TxnFlow", "0");
 
 //                        if (File.Exists(GlobalMembers.objPATH_DETAIL.strPassbook_Image_Path + "\\F.bmp"))
 //                            File.Delete(GlobalMembers.objPATH_DETAIL.strPassbook_Image_Path + "\\F.bmp");
@@ -94,6 +94,11 @@ public class Timer implements Runnable {
 //                        lblTime.Visible = false;
 //                        lblAppVersion.Visible = false;
 
+                            GlobalMembers.objClientConfigIni.put("Kiosk_Details", "TxnFlow", "0");
+                            GlobalMembers.txtLabel.setVisible(false);
+                            GlobalMembers.time.setVisible(false);
+                            GlobalMembers.headingLabel.setVisible(false);
+                            GlobalMembers.imgLabel.setIcon(GlobalMembers.DisplayImage("K002"));
                             RotateCount = 0;
                             GlobalMembers.bIsNewTransaction = true;
                             GlobalMembers.strTxnRRN = "";
@@ -127,6 +132,9 @@ public class Timer implements Runnable {
                     case AuthenticationRequest: {
                         try {
                             GlobalMembers.bThreadProtection = true;
+
+                            GlobalMembers.DisplayImage("K004");
+
                             Log.Write("Authentication request");
                             GlobalMembers.ResetISOFields();
 
@@ -428,6 +436,7 @@ public class Timer implements Runnable {
                                             GlobalMembers.bThreadProtection = false;
 //                                            GlobalMembers.objTaskState = GlobalMembers.Task.TransactionEnd;
                                         } else {
+                                            GlobalMembers.DisplayImage("K005");
                                             Log.Write("Before Compose Print Data");
                                             bTransactionDataReceived = true;
 
@@ -769,9 +778,142 @@ public class Timer implements Runnable {
 //                        }
                     }
                     break;
+                    case PassbookScanned:{
+                        try
+                        {
+                            GlobalMembers.objClientConfigIni.put("Kiosk_Details", "TxnFlow", "1");
+                            GlobalMembers.bThreadProtection = true;
+//                            HeartBeat.Enabled = false;
+
+                            if (GlobalMembers.bIsNewTransaction)
+                            {
+                                Log.Write("***************TRANSACTION SESSION STARTED*******************");
+                                Log.Write("***************TRANSACTION SESSION STARTED*******************", "MSGComm");
+                            }
+
+                            GlobalMembers.strBarcode = "";
+                           GlobalMembers.DisplayImageOnForm("K003", "", true);
+
+                            if (GlobalMembers.bIsPassbookEpson)
+                            {
+                                if (GlobalMembers.AccountNumber != null && GlobalMembers.AccountNumber.length() > 0)
+                                {
+                                    Log.Write("Barcode Read Successfully with Epson" );
+
+                                    if (GlobalMembers.bMoreData)  //if page turn found
+                                    {
+                                        //If acc no found and matched with previous after page turn
+                                        if (GlobalMembers.AccountNumber.equals(GlobalMembers.PrvAccountNumber))
+                                        {
+                                            //Account matched after page turn
+                                            Log.Write("Account number match with previous");
+                                            Log.Write("Barcode match");
+
+
+                                            DisplayImageOnForm("K005", "", true);
+
+                                            //compose the data and print on passbook, if function failed then send ACK
+                                            String strBuffer = "";
+//                                            if (ComposeAndPrintData(false,  strBuffer))
+//                                            {
+//                                                if (GlobalMembers.bIsPassbookEpson == false)
+//                                                    Ollivtti_Obj.PrintData(strBuffer);
+//                                                else
+//                                                    EPSON_Obj.PrintData(strBuffer);
+//
+//                                                Log.Write("After Compose Print Data, set bIsPositiveACK = true" );
+//                                                GlobalMembers.bIsPositiveACK = true;
+//                                            }
+//                                            else
+//                                            {
+//                                                //Error
+//                                                GlobalMembers.bThreadProtection = false;
+//                                                GlobalMembers.objTaskState = GlobalMembers.Task.TransactionError;
+////                                                PostMessage(GlobalMembers.MainHandle, TransactionError, IntPtr.Zero, IntPtr.Zero);
+//                                            }
+                                        }
+                                        else
+                                        {
+                                            //Account mismatch
+                                            Log.Write("ACCOUNT NUMBER MISMATCH WITH PREVIOUS" );
+                                            Log.Write("Barcode mismatch");
+
+                                            GlobalMembers.bThreadProtection = false;
+                                            GlobalMembers.objTaskState = GlobalMembers.Task.TransactionError;
+//                                            PostMessage(GlobalMembers.MainHandle, TransactionError, IntPtr.Zero, (IntPtr)1003);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Log.Write("Barcode read- " + GlobalMembers.AccountNumber);
+                                        GlobalMembers.PrvAccountNumber = GlobalMembers.AccountNumber;
+                                        GlobalMembers.bThreadProtection = false;
+                                        GlobalMembers.objTaskState = GlobalMembers.Task.AuthenticationRequest;
+//                                        PostMessage(GlobalMembers.MainHandle, AuthenticationTransactionRequest, IntPtr.Zero, IntPtr.Zero);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                File file = new File(GlobalMembers.objPATH_DETAIL.strPassbook_Image_Path + "\\R.bmp");
+                                if (file.exists())
+                                {
+                                    GlobalMembers.bIsFullScanBarcode = (!objLksdbIni.get("DEMO", "Full_Scan_Barcode").toLowerCase().equals("no"));
+                                    if (GlobalMembers.bIsFullScanBarcode)
+                                    {
+                                        //reset flag for not checking orientation in first try
+                                        bIsCheckingBCOrientation = false; //v26.1.1. demo  //V26.1.1.10
+
+                                        String Command = " --raw -q ";
+                                        //todo
+//                                        Runtime.getRuntime().exec("C:\\KIOSK\\zbarimg", Command + GlobalMembers.objPATH_DETAIL.strPassbook_Image_Path + "\\R.bmp");
+//                                        commandPrompt = new CommandPrompt("C:\\KIOSK\\zbarimg", Command + GlobalMembers.objPATH_DETAIL.strPassbook_Image_Path + @"\R.bmp");
+
+                                        // Run command asynchronously
+//                                        commandPrompt.OutputDataReceived += Barcode_DataReceived;
+//                                        commandPrompt.BeginRun();
+                                    }
+                                    else
+                                    {
+                                            //todo
+//                                        CropImage(GlobalMembers.objPATH_DETAIL.strPassbook_Image_Path + "\\R.bmp", ImageSplitType.Horizontal);  // V25.1.1.4
+
+                                        //  CropImage(GlobalMembers.objPATH_DETAIL.strPassbook_Image_Path + @"\R.bmp", GlobalMembers.objPATH_DETAIL.strPassbook_Image_Path + @"\Reardown.bmp", DOWN_BMP);
+
+                                        //if image exist
+                                        // if (File.Exists(GlobalMembers.objPATH_DETAIL.strPassbook_Image_Path + @"\Reardown.bmp"))
+                                        File file1 = new File("GlobalMembers.objPATH_DETAIL.strPassbook_Image_Path + \"\\\\R_Top.bmp\"");
+                                        if (file1.exists()) // R_Left  // V25.1.1.4  // wrng R_Bottom
+                                        {
+                                            String Command = " --raw -q ";
+
+                                            //  commandPrompt = new CommandPrompt("C:\\KIOSK\\zbarimg", Command + GlobalMembers.objPATH_DETAIL.strPassbook_Image_Path + @"\Reardown.bmp");
+
+//                                            commandPrompt = new CommandPrompt("C:\\KIOSK\\zbarimg", Command + GlobalMembers.objPATH_DETAIL.strPassbook_Image_Path + @"\R_Top.bmp"); //R_Top //R_Bottom  // V25.1.1.4
+//                                            Runtime.getRuntime().exec("C:\\KIOSK\\zbarimg", Command + GlobalMembers.objPATH_DETAIL.strPassbook_Image_Path + "\\R_Top.bmp");
+                                            // Run command asynchronously
+                                            //todo
+//                                            commandPrompt.OutputDataReceived += Barcode_DataReceived;
+//                                            commandPrompt.BeginRun();
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    GlobalMembers.bThreadProtection = false;  //  added in V260.1.1.13  9 dec 2015
+                                    GlobalMembers.objTaskState = GlobalMembers.Task.ReadBarcodeFromSD;
+//                                    PostMessage(GlobalMembers.MainHandle, ReadBarcodeFromSD, IntPtr.Zero, IntPtr.Zero);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Write("Exception in WndProc->PassbookScanned: " + ex.getMessage());
+                        }
+                    }
+                    break;
                     default:
                         break;
-
                 }
                 System.gc();
             }

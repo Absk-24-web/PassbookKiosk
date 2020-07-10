@@ -1,17 +1,25 @@
 package Main;
 
+import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type;
 import org.ini4j.Wini;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public  class GlobalMembers {
-
+    public static String dirPath;
+    private static PlaySound playSound;
 
 
     static {
         try{
+            dirPath = System.getProperty("user.dir");
             new GlobalMembers();
 //            System.setProperty("java.library.path", "C:\\Users\\df-dev16\\IdeaProjects\\PassbookKisok\\src\\DLL");
 //            System.out.println(System.getProperty("java.library.path"));
@@ -22,9 +30,20 @@ public  class GlobalMembers {
     }
 
 
+
+
 //    public static native long InitTRC(IntPtr hWnd);
 
     public static native boolean LPTRC_MENWrite(String data);
+    public static JLabel imgLabel;
+    public static JLabel txtLabel;
+    public static JLabel time;
+    public static JLabel headingLabel;
+    public static JLabel lblMarathiScreenText;
+    public static JLabel lblEnglishScreenText;
+    public static JLabel lblImageErr1;
+    public static JLabel lblImageErr2;
+    public static JLabel lblErrorCode;
 
     public static Wini objLksdbIni = null;
     public static Wini objTxnIni = null;
@@ -95,7 +114,7 @@ public  class GlobalMembers {
     //Request type object
     public static MsgLenType eMsgLenType;
 
-    public class ISOFields
+    public static class ISOFields
     {
         //public String strDesc;
         public int iType;
@@ -241,7 +260,7 @@ public  class GlobalMembers {
     public static String LOGTCP = "Transport";
 
     //INI Structures
-    public class CBS
+    public static class CBS
     {
         public String strIP;
         public String strPort;
@@ -250,7 +269,7 @@ public  class GlobalMembers {
         public boolean bIs_TCP;
     }
 
-    public class ISO8583
+    public static class ISO8583
     {
         public String DE41;
         public String DE102;
@@ -312,7 +331,7 @@ public  class GlobalMembers {
     public static String strTotalLinesPrinted;
     public static String strTotalLinesToBePrinted;
 
-    public class ADMIN
+    public static class ADMIN
     {
         public String Account_1 = "";
         public String Password_1 = "";
@@ -320,14 +339,14 @@ public  class GlobalMembers {
         public String Password_2 ="" ;
     }
 
-    public class VERSION
+    public static class VERSION
     {
         public String App_Ver;
         public String Ghost_ver;
         public String Build_Date;
     }
 
-    public class DETAILS
+    public static class DETAILS
     {
         public String Company_Name;
         public String Bank_Name;
@@ -359,7 +378,7 @@ public  class GlobalMembers {
     //    public int iPendingTxns;
     //}
 
-    public class PB_ACK_DETAILS
+    public static class PB_ACK_DETAILS
     {
         /// <summary>
         /// It is txn posting date of 14 bytes
@@ -397,7 +416,7 @@ public  class GlobalMembers {
         public String strLastTxnSerialNo;
     }
 
-    public class KIOSK_TIMERS
+    public static class KIOSK_TIMERS
     {
         public int iTmrRotator1;
         public int iTmrRotator2;
@@ -409,7 +428,7 @@ public  class GlobalMembers {
         public int iTmrTransaction;
     }
 
-    public class LAST_TXN_DETAILS
+    public static class LAST_TXN_DETAILS
     {
         /// <summary>
         /// Last print date
@@ -464,7 +483,7 @@ public  class GlobalMembers {
 
         objISO = new ISOFields[131];
         for (int i=0; i<=128; i++){
-            objISO[i]=new ISOFields();
+            objISO[i]= new ISOFields();
         }
 
         //set the type and length of fields which are coming in request
@@ -660,7 +679,9 @@ public  class GlobalMembers {
             }
         }
         catch (Exception excp)
-        { }
+        {
+            Log.Write("Exception in MISData:-"+excp.getMessage());
+        }
     }
 
     public static void ResetISOFields() {
@@ -682,4 +703,100 @@ public  class GlobalMembers {
         }
 
     }
+
+    public static ImageIcon DisplayImage(String imageName){
+        ImageIcon imageIcon = null;
+        try {
+            if(imageName.equals("K002")){
+                BufferedImage  imgBuffered = ImageIO.read(new File(dirPath+"/src/Image/Background.jpg"));
+                imageIcon = new ImageIcon(imgBuffered);
+            }
+            Log.Write(dirPath + "\\src\\Image\\" + imageName + ".JPG image shown");
+        } catch (IOException e) {
+          Log.Write("Execption in Display image:-"+imageName+" "+e.toString());
+        }
+        return imageIcon;
+    }
+
+    public static void DisplayImageOnForm(String ImageName, String strErrorMsg , boolean bSync)
+    {
+        int err = 0;    // last error
+        try
+        {
+            GlobalMembers.imgLabel.setVisible(true);
+//            pbxBackground.Image = Image.FromFile(GlobalMembers.strImagesPath + "\\Background" + ".jpg");
+            GlobalMembers.imgLabel.setIcon(GlobalMembers.DisplayImage(ImageName));
+
+            lblImageErr1.setVisible(false); lblImageErr2.setVisible(false);
+
+
+            int name = Integer.parseInt(ImageName.substring(1));
+            if (!strErrorMsg.equals(""))
+            {
+                lblMarathiScreenText.setText("");
+//                lblMarathiScreenText.Top = 300;
+                lblMarathiScreenText.setText(GlobalMembers.arRegionalScreenText[name]);
+
+                lblEnglishScreenText.setText("");
+//                lblEnglishScreenText.Top = lblMarathiScreenText.Top + 110;
+                lblEnglishScreenText.setText(GlobalMembers.arEnglishScreenText[name]);
+
+
+                lblEnglishScreenText.setVisible(true);
+                lblMarathiScreenText.setVisible(true);
+
+                Log.Write(GlobalMembers.strImagesPath + "\\" + ImageName + ".JPG image shown");
+
+//                lblErrorCode.Top = lblEnglishScreenText.Top + 100;
+                lblErrorCode.setText(strErrorMsg);
+                lblErrorCode.setVisible(true);
+
+                Log.Write("Error msg - " + strErrorMsg);
+            }
+            else
+            {
+
+                lblErrorCode.setText("");
+                lblErrorCode.setVisible(false);
+
+                lblMarathiScreenText.setText("");
+//                lblMarathiScreenText.Top = 300;
+                lblMarathiScreenText.setText(GlobalMembers.arRegionalScreenText[name]);
+
+                lblEnglishScreenText.setText("");
+//                lblEnglishScreenText.Top = lblMarathiScreenText.Top +  110;
+                lblEnglishScreenText.setText(GlobalMembers.arEnglishScreenText[name]);
+
+
+                lblEnglishScreenText.setVisible(true);
+                lblMarathiScreenText.setVisible(true);
+
+                Log.Write(GlobalMembers.strImagesPath + "\\" + ImageName + ".JPG image shown");
+            }
+
+            if (!ImageName.equals("K002"))
+            {
+                // play the sound from the selected filename
+
+                if (bSync){
+                    PlaySound.filePath = GlobalMembers.strAudioPath + "\\" + ImageName + ".wav";
+                    playSound = new PlaySound();
+                    PlaySound.play();
+                }
+                else{
+                    PlaySound.filePath =  GlobalMembers.strAudioPath + "\\" + ImageName + ".wav";
+                    playSound = new PlaySound();
+                    PlaySound.play();
+                }
+            }
+        }
+        catch(Exception e)
+        {
+            // grab the underlying Win32 error code
+//            err = Marshal.GetLastWin32Error();
+                Log.Write("ERROR IN AUDIO PLAY" + e.toString());
+        }
+    }
+
+
 }

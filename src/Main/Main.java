@@ -1,10 +1,7 @@
 package Main;
 
 
-import com.sun.xml.internal.bind.v2.TODO;
-import javafx.application.Application;
 import org.ini4j.Wini;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -20,14 +17,12 @@ import static Main.GlobalMembers.objHealthIni;
 import static Main.GlobalMembers.objLksdbIni;
 
 public class Main extends JFrame {
+    private JPanel contentPane;
     public static String dirPath;
     private static Dimension screenSize;
-    private static BufferedImage background;
-    private static JLabel textLabel;
     public static  int AppInitCount = 0;
     public static Socket client;
-    public static JLabel time;
-    public static JLabel imgLabel;
+    public static ImageIcon image;
 
     static {
         dirPath = System.getProperty("user.dir");
@@ -48,6 +43,8 @@ public class Main extends JFrame {
                         }
                     });
                     th.start();
+                    Thread thTime = new Thread(new Time());
+                    thTime.start();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -58,68 +55,82 @@ public class Main extends JFrame {
     public Main() {
         screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         try {
-            background  = ImageIO.read(new File(dirPath+"\\src\\Image\\Webp.net-resizeimage (1).jpg"));
+            BufferedImage imgBuffered=ImageIO.read(new File(dirPath+"/src/Image/abc.jpg"));
+            image = new ImageIcon(imgBuffered);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         //component initialization
         initialize();
-
     }
 
     public void initialize() {
-        setLocation(0, 0);
-        setSize(screenSize.width,screenSize.height);
-        setUndecorated(true);
+        setBounds(0,0,screenSize.width,screenSize.height);
+        this.setUndecorated(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(null);
-        imgLabel = new JLabel(new ImageIcon(background));
-        imgLabel.setLocation(0,0);
-        imgLabel.setBounds(0,0,1500,1080);
+        contentPane = new JPanel();
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        setContentPane(contentPane);
+        contentPane.setLayout(null);
 
-        JLabel headingLabel = new JLabel("MUNICIPAL CO.OP BANK PASSBOOK KIOSK");
-        headingLabel.setBounds(350,100,800,200);
-        headingLabel.setForeground(Color.BLUE);
-        headingLabel.setFont(new Font("Serif", Font.BOLD, 30));
-        imgLabel.add(headingLabel);
+        GlobalMembers.imgLabel = new JLabel("");
+        GlobalMembers.imgLabel.setBounds(0, 0, 1368, 768);
+        GlobalMembers.imgLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        GlobalMembers.imgLabel.setVerticalAlignment(SwingConstants.TOP);
+        GlobalMembers.imgLabel.setIcon(image);
+        contentPane.add(GlobalMembers.imgLabel);
 
 
-        textLabel = new JLabel();
-        textLabel.setForeground(Color.BLUE);
-        textLabel.setBounds(400,200,600,200);
-        textLabel.setFont(new Font("Serif", Font.BOLD, 30));
-        textLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        textLabel.setVerticalAlignment(SwingConstants.CENTER);
-        imgLabel.add(textLabel);
+        GlobalMembers.headingLabel = new JLabel("MUNICIPAL CO.OP BANK PASSBOOK KIOSK");
+        GlobalMembers.headingLabel.setBounds(350,100,800,200);
+        GlobalMembers.headingLabel.setForeground(Color.BLUE);
+        GlobalMembers.headingLabel.setFont(new Font("Serif", Font.BOLD, 30));
+        GlobalMembers.imgLabel.add(GlobalMembers.headingLabel);
 
-        time = new JLabel(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")));
-        time.setBounds(550,300,600,200);
-        time.setForeground(Color.BLUE);
-        time.setFont(new Font("Serif", Font.BOLD, 30));
-        imgLabel.add(time);
+        GlobalMembers.txtLabel = new JLabel();
+        GlobalMembers.txtLabel.setForeground(Color.BLUE);
+        GlobalMembers.txtLabel.setBounds(400,200,600,200);
+        GlobalMembers.txtLabel.setFont(new Font("Serif", Font.BOLD, 30));
+        GlobalMembers.txtLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        GlobalMembers.txtLabel.setVerticalAlignment(SwingConstants.CENTER);
+        GlobalMembers.imgLabel.add(GlobalMembers.txtLabel);
 
-        this.add(imgLabel);
+        GlobalMembers.time = new JLabel(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")));
+        GlobalMembers.time.setBounds(550,300,600,200);
+        GlobalMembers.time.setForeground(Color.BLUE);
+        GlobalMembers.time.setFont(new Font("Serif", Font.BOLD, 30));
+        GlobalMembers.imgLabel.add(GlobalMembers.time);
+
+        Icon enIcon = new ImageIcon(dirPath+"\\src\\Image\\English.png");
+        JButton engButton = new JButton(enIcon);
+        engButton.setBounds(1050,500,270,70);
+//        GlobalMembers.imgLabel.add(engButton);
+
+        Icon hiIcon = new ImageIcon(dirPath+"\\src\\Image\\Hindi.png");
+        JButton hinButton = new JButton(hiIcon);
+        hinButton.setBounds(1050,600,270,70);
+//        GlobalMembers.imgLabel.add(hinButton);
+
         setVisible(true);
     }
 
     public static void start(){
         try{
             if (GlobalInitialization()) {
-                textLabel.setText("Configuration is proper....");
-                time.setText(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")));
+                GlobalMembers.txtLabel.setText("Configuration is proper....");
 
                 Thread.sleep(1000);
+                if(StartEngine()){
+                    Log.Write("Starting Application Kernel");
 
-                Log.Write("Starting Application Kernel");
-                StartEngine();
-                GlobalMembers.objTaskState = GlobalMembers.Task.TransactionStart;
+                    GlobalMembers.objTaskState = GlobalMembers.Task.TransactionStart;
 
-                if (GlobalMembers.objTimer == null)
-                    GlobalMembers.objTimer = new Timer();
+                    if (GlobalMembers.objTimer == null)
+                        GlobalMembers.objTimer = new Timer();
 
-                Thread objThrdMain = new Thread(GlobalMembers.objTimer);
-                objThrdMain.start();
+                    Thread objThrdMain = new Thread(GlobalMembers.objTimer);
+                    objThrdMain.start();
+                }
             } else{
                 Log.Write("configuration is not proper...");
                 System.out.println(GlobalInitialization());
@@ -149,9 +160,9 @@ public class Main extends JFrame {
 
 
             if (GlobalMembers.objCnctnIni != null) {
-                textLabel.setText("Checking configuration file....");
+                GlobalMembers.txtLabel.setText("Checking configuration file....");
 
-                Thread.sleep(1000);
+                Thread.sleep(5000);
 
                 // //load connection settings
                 GlobalMembers.objCBS.strIP = GlobalMembers.objCnctnIni.get("CBS", "IP");
@@ -471,6 +482,7 @@ public class Main extends JFrame {
             GlobalMembers.byTrailingData = 0;
 
             GlobalMembers.eMsgLenType = GlobalMembers.MsgLenType.ASCII;
+            Thread.sleep(2000);
 
 //                            LoadScreenData();
             return true;
@@ -480,46 +492,14 @@ public class Main extends JFrame {
         }
     }
 
-//    public void GetLastBootTime()
-//    {
-//        try
-//        {
-//            DateTime LastBTime = new DateTime();
-//            // define a select query
-//            SelectQuery query = new SelectQuery("SELECT LastBootUpTime FROM Win32_OperatingSystem WHERE Primary='true'");
-//
-//            // create a new management object searcher and pass it
-//            // the select query
-//            ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
-//
-//            // get the datetime value and set the local boot
-//            // time variable to contain that value
-//            foreach (ManagementObject mo in searcher.Get())
-//            {
-//                LastBTime = ManagementDateTimeConverter.ToDateTime(mo.Properties["LastBootUpTime"].Value.ToString());
-//            }
-//
-//            GlobalMembers.WriteLog("KIOSK Last Boot Time " + LastBTime.ToString());
-//            GlobalMembers.WriteLog("KIOSK LAST BOOT TIME " + LastBTime.ToString() );
-//        }
-//        catch (Exception excp)
-//        {
-//            GlobalMembers.WriteLog("GetLastBootTime() Excp-" + excp.Message);
-//        }
-//        finally
-//        {
-//            GC.Collect();
-//        }
-//    }
-
-    private static void StartEngine()
+    private static boolean StartEngine()
     {
         try
         {
             //Reset the CBS flag to false
             GlobalMembers.bIsCBSConnected = false;
 
-            textLabel.setText("Please Wait While Passbook Printer Is Being Checked....");
+            GlobalMembers.txtLabel.setText("Please Wait While Passbook Printer Is Being Checked....");
             // check for Passbook
 
             for (int i = 0; i < 20; i++)
@@ -553,11 +533,12 @@ public class Main extends JFrame {
                 if (Status)
                 {
                   Log.Write("Passbook Status = Connected");
-                    textLabel.setText("Passbook Printer Connected....");
+                    GlobalMembers.txtLabel.setText("Passbook Printer Connected....");
 
                     //For RMS //V26.1.2.9
                     objHealthIni.put("Health_Details" , "0", "Passbook");
                     objHealthIni.put("Health_Details", "Changes_DoneHealth", "1");
+//                    return true;
                 }
                 else
                 {
@@ -569,7 +550,7 @@ public class Main extends JFrame {
                     objHealthIni.put("Health_Details", "Changes_DoneHealth", "1");
 
                     Log.Write("Passbook Status = Disconnected");
-                    textLabel.setText("Passbook Printer Not Connected....");
+                    GlobalMembers.txtLabel.setText("Passbook Printer Not Connected....");
                     Thread.sleep(2000);
 
 //                    tmrPassbookCheck.Enabled = true;
@@ -578,13 +559,13 @@ public class Main extends JFrame {
 //                    lblMarathiScreenText.Visible = false;
 //                    lblText.Visible = lblTime.Visible = lblAppVersion.Visible = false;
 //                    pbxBackground.Image = Image.FromFile(Application.StartupPath + "\\Lipi\\OOOS\\001.JPG");  //05May14
-                    return;
+//                    return false;
                 }
             }
             else
             {
                 Log.Write("Passbook Status = Demo");
-                textLabel.setText("Passbook Printer Demo....");
+                GlobalMembers.txtLabel.setText("Passbook Printer Demo....");
 
                 objHealthIni.put("Health_Details" , "0", "Passbook");
                 objHealthIni.put("Health_Details", "Changes_DoneHealth", "1");
@@ -595,26 +576,26 @@ public class Main extends JFrame {
 
 
             Log.Write("Checking RMS connection");
-            textLabel.setText("Please Wait While Connectivity With RMS Is Being Checked....");
+            GlobalMembers.txtLabel.setText("Please Wait While Connectivity With RMS Is Being Checked....");
             Thread.sleep(2000);
 
             Wini objRMSIni = new Wini(new File("C:\\LIPIRMS_Client\\KioskClientConfig.ini"));
             //if the machine is not registered with RMS
             if (!objRMSIni.get("Kiosk_Details", "Kiosk_DetailSent").equals("1"))
             {
-                textLabel.setText("Connectivity with RMS Server Failed....Connect RMS Client First");
+                GlobalMembers.txtLabel.setText("Connectivity with RMS Server Failed....Connect RMS Client First");
                 Log.Write("Checking RMS connectivity- Failed");
                 Log.Write("CHECKING RMS CONNECTIVITY- FAILED" );
-                return;
+//                return false;
             }
 
-            textLabel.setText("Connected with RMS Server....");
+            GlobalMembers.txtLabel.setText("Connected with RMS Server....");
             Log.Write("Checking RMS connectivity- Succeed");
             Thread.sleep(2000);
 
             Log.Write("CHECKING NETWORK CONNECTION" );
 
-            textLabel.setText("Please Wait While Connectivity With CBS Is Being Checked....");
+            GlobalMembers.txtLabel.setText("Please Wait While Connectivity With CBS Is Being Checked....");
 
             Thread.sleep(2000);
 
@@ -656,36 +637,53 @@ public class Main extends JFrame {
 //                        iMsgType = -1;//mean Connection not at start time...
 //                        client.connect();
                     }
+                    return true;
                 }
                 catch (Exception excp)
                 {
 //                    iMsgType = -1;//mean Connection not at start time...
 
-                    //Update health INI ////V26.1.2.9
+                    //Update health INI
                     objHealthIni.put("Health_Details", "Application", "1");
                     objHealthIni.put("Health_Details", "Changes_DoneHealth", "1");
 
                     Log.Write("TCP Connection not established = " + excp.getMessage());
                     Log.Write("CONNECTION WITH CBS IS NOT ESTLABLISHED" );
 
-//                    imgLabel = new JLabel(new ImageIcon(ImageIO.read(new File(dirPath+"\\src\\Image\\OOOS.JPG"))));
-
-//                    lblAppVersion.Visible = lblText.Visible = lblTime.Visible = false;      //For V1.1.1.1
-
-                    //indicate network thread to check connectivity
-//                    thrdNetworkNotifier.Set();
+//                    lblAppVersion.Visible = lblText.Visible = lblTime.Visible = false;
+                    GlobalMembers.time.setVisible(false); GlobalMembers.txtLabel.setVisible(false); GlobalMembers.headingLabel.setVisible(false);
+                    BufferedImage imgBuffered=ImageIO.read(new File(dirPath+"/src/Image/OOOS.JPG"));
+                    ImageIcon oooS = new ImageIcon(imgBuffered);
+                    GlobalMembers.imgLabel.setIcon(oooS);
+                    return false;
                 }
             }
         }
         catch (Exception excp)
         {
             Log.Write("StartEngine() Excp-" + excp.getMessage());
+            return false;
         }
         finally
         {
             System.gc();
         }
+        return true;
     }
 
+}
+class Time implements Runnable{
+    @Override
+    public void run() {
+        while (true){
+            String strTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
+            GlobalMembers.time.setText(strTime);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
 
