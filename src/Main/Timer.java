@@ -1,12 +1,6 @@
 package Main;
 
-import javafx.application.Application;
-import org.ini4j.Wini;
-
 import java.io.*;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -22,6 +16,12 @@ public class Timer implements Runnable {
     private boolean bTransactionDataReceived;
     private boolean bIsCheckingBCOrientation = false;
     private static final String dirPath;
+    private String[] strTxnLine = new String[0];
+    private String[] strTxnPostedDateACK = new String[0];
+    private String[] strEndBalanceACK = new String[0];
+    private String[] strTransIdACK = new String[0];
+    private String[] strDateACK = new String[0];
+    private String[] strTransSerialNoACK = new String[0];
 
         static {
             dirPath = System.getProperty("user.dir");
@@ -125,7 +125,7 @@ public class Timer implements Runnable {
                         } catch (Exception ex) {
                             Log.Write("Exception in WndProc->TransactionStart: " + ex.getMessage());
                             bThreadProtection = false;
-//                            GlobalMembers.objTaskState = GlobalMembers.Task.TransactionEnd;
+                            GlobalMembers.objTaskState = GlobalMembers.Task.TransactionEnd;
                         }
                     }
                     break;
@@ -133,19 +133,19 @@ public class Timer implements Runnable {
                         try {
                             bThreadProtection = true;
 
-//                            DisplayImageOnForm("K004","",true);
+                            DisplayImageOnForm("K004","",true);
 
                             Log.Write("Authentication request");
                             ResetISOFields();
 
                             UpdateSTAN();
 
-//                            Array.Resize(ref strTxnLine, 0);
-//                            Array.Resize(ref strTxnPostedDateACK, 0);
-//                            Array.Resize(ref strEndBalanceACK, 0);
-//                            Array.Resize(ref strTransIdACK, 0);
-//                            Array.Resize(ref strDateACK, 0);
-//                            Array.Resize(ref strTransSerialNoACK, 0);
+                            Arrays.copyOf(strTxnLine,0);
+                            Arrays.copyOf(strTxnPostedDateACK,0);
+                            Arrays.copyOf(strEndBalanceACK,0);
+                            Arrays.copyOf(strTransIdACK,0);
+                            Arrays.copyOf(strDateACK,0);
+                            Arrays.copyOf(strTransSerialNoACK,0);
 
                             strTotalLinesPrinted = "0";
                             strTotalLinesToBePrinted = "0";
@@ -211,7 +211,7 @@ public class Timer implements Runnable {
                                             baos.write(buffer, 0, input.read(buffer));
 
                                             bResponse = baos.toByteArray();//ref bResponse
-//                                            String res = Arrays.toString(GlobalMembers.bResposne);
+//                                            String res = Arrays.toString(GlobalMembers.bResponse);
 //                                            System.out.println(res);
                                             objTaskState = Task.AuthenticationResponse;
 
@@ -269,7 +269,7 @@ public class Timer implements Runnable {
                                     //if field 125 contains error
                                     if (objISO[125].strValue.contains("Error")) {
                                         bThreadProtection = false;
-                                        //send error no by ading 2000 to it
+                                        //send error no by adding 2000 to it
                                         objTaskState = Task.TransactionError;
                                         //todo substring
                                         errorCode = 2000 + Integer.parseInt(objISO[125].strValue.substring(14, 3));
@@ -438,13 +438,14 @@ public class Timer implements Runnable {
                                             Log.Write("No more pending txns in N00 case");
 
                                             bThreadProtection = false;
-//                                            GlobalMembers.objTaskState = GlobalMembers.Task.TransactionEnd;
+                                            GlobalMembers.objTaskState = GlobalMembers.Task.TransactionEnd;
                                         } else {
                                             DisplayImage("K005");
                                             Log.Write("Before Compose Print Data");
                                             bTransactionDataReceived = true;
 
                                             String strBuffer = "";
+                                            // TODO: 11-07-2020  composeAndPrint
 //                                            if (ComposeAndPrintData(true,  strBuffer)) {
 //                                                if (GlobalMembers.bIsPassbookEpson == false)
 //                                                    Ollivtti_Obj.PrintData(strBuffer);
@@ -536,7 +537,6 @@ public class Timer implements Runnable {
 
 //                            bThreadProtection = false;
                             objTaskState = Task.TransactionStart;
-//                            PostMessage(GlobalMembers.MainHandle, TransactionStart, IntPtr.Zero, IntPtr.Zero);
                         }
                         catch (Exception ex)
                         {
@@ -553,7 +553,6 @@ public class Timer implements Runnable {
 
                             bThreadProtection = false;
                             objTaskState = Task.TransactionEnd; errorCode=9;
-//                        PostMessage(GlobalMembers.MainHandle, TransactionEnd, (IntPtr) 9, IntPtr.Zero);
                         } catch (Exception ex) {
                             Log.Write("Exception in WndProc->RequestTimeout: " + ex.getMessage());
                         }
@@ -562,7 +561,7 @@ public class Timer implements Runnable {
                     case TransactionError: {
                         try
                         {
-                            bThreadProtection = true;   //  added in V260.1.1.13  9 dec 2015
+                            bThreadProtection = true;
 
                             Log.Write("Txn error found");
                             switch (errorCode)
@@ -772,19 +771,16 @@ public class Timer implements Runnable {
                             {
 //                                bThreadProtection = false;
                                 objTaskState = Task.TransactionEnd; errorCode = 7;
-//                                PostMessage(GlobalMembers.MainHandle, TransactionEnd, (IntPtr)7, IntPtr.Zero);
                             }
                             else if (bTransactionDataReceived)
                             {
 //                                bThreadProtection = false;
                                 objTaskState = Task.PassbookNegAckRequest;
-//                                PostMessage(GlobalMembers.MainHandle, PassbookNegAckRequest, IntPtr.Zero, IntPtr.Zero);
                             }
                             else
                             {
 //                                bThreadProtection = false;
                                 objTaskState = Task.TransactionEnd;
-//                                PostMessage(GlobalMembers.MainHandle, TransactionEnd, IntPtr.Zero, IntPtr.Zero);
                             }
                         }
                         catch (Exception ex)
@@ -793,7 +789,6 @@ public class Timer implements Runnable {
 
 //                            bThreadProtection = false;
                             objTaskState = Task.TransactionEnd;
-//                            PostMessage(GlobalMembers.MainHandle, TransactionEnd, IntPtr.Zero, IntPtr.Zero);
                         }
                     }
                     break;
@@ -860,7 +855,6 @@ public class Timer implements Runnable {
 
                                             bThreadProtection = false;
                                             objTaskState = Task.TransactionError; errorCode = 1003;
-//                                            PostMessage(GlobalMembers.MainHandle, TransactionError, IntPtr.Zero, (IntPtr)1003);
                                         }
                                     }
                                     else
@@ -869,7 +863,6 @@ public class Timer implements Runnable {
                                         PrvAccountNumber = AccountNumber;
                                         bThreadProtection = false;
                                         objTaskState = Task.AuthenticationRequest;
-//                                        PostMessage(GlobalMembers.MainHandle, AuthenticationTransactionRequest, IntPtr.Zero, IntPtr.Zero);
                                     }
                                 }
                             }
@@ -882,7 +875,7 @@ public class Timer implements Runnable {
                                     if (bIsFullScanBarcode)
                                     {
                                         //reset flag for not checking orientation in first try
-                                        bIsCheckingBCOrientation = false; //v26.1.1. demo  //V26.1.1.10
+                                        bIsCheckingBCOrientation = false;
 
                                         String Command = " --raw -q ";
                                         //todo
@@ -920,9 +913,8 @@ public class Timer implements Runnable {
                                 }
                                 else
                                 {
-                                    bThreadProtection = false;  //  added in V260.1.1.13  9 dec 2015
+                                    bThreadProtection = false;
                                     objTaskState = Task.ReadBarcodeFromSD;
-//                                    PostMessage(GlobalMembers.MainHandle, ReadBarcodeFromSD, IntPtr.Zero, IntPtr.Zero);
                                 }
                             }
                         }
@@ -933,7 +925,7 @@ public class Timer implements Runnable {
                     }
                     break;
                     case ReadBarcodeFromSD:{
-                        bThreadProtection = true;   //  added in V260.1.1.13  9 dec 2015
+                        bThreadProtection = true;
                         Log.Write("thrdBarcodeNotifier Set to read barcode " );
                         //StartReadBarcode = true;
                         //todo barcode
@@ -1037,8 +1029,7 @@ public class Timer implements Runnable {
                             {
                                 Log.Write("PassbookNegAckRequest message format error- "+strErrorMsg , "MSGComm");
                                 bThreadProtection = false;
-//                                GlobalMembers.objTaskState = GlobalMembers.Task.TransactionEnd;
-//                                PostMessage(GlobalMembers.MainHandle, TransactionEnd, IntPtr.Zero, IntPtr.Zero);
+                                GlobalMembers.objTaskState = GlobalMembers.Task.TransactionEnd;
                             }
                         }
                         catch (Exception ex)
@@ -1086,7 +1077,6 @@ public class Timer implements Runnable {
 
                             bThreadProtection = false;
                             objTaskState = Task.TransactionEnd;
-//                            PostMessage(GlobalMembers.MainHandle, TransactionEnd, IntPtr.Zero, IntPtr.Zero);
                         }
                         catch (Exception ex)
                         {
@@ -1094,7 +1084,6 @@ public class Timer implements Runnable {
 
                             bThreadProtection = false;
                             objTaskState = Task.TransactionEnd;
-//                            PostMessage(GlobalMembers.MainHandle, TransactionEnd, IntPtr.Zero, IntPtr.Zero);
                         }
                     }
                     break;
@@ -1206,7 +1195,7 @@ public class Timer implements Runnable {
                     case GetLastPrintDetailResponse:{
                         try
                         {
-                            bThreadProtection = true;   //  added in V260.1.1.13  9 dec 2015
+                            bThreadProtection = true;
 
 //                            timer2.Enabled = false;
 
@@ -1221,7 +1210,7 @@ public class Timer implements Runnable {
                             //if reply msg filter properly
                             if (ISOMsgParser.FilterISO8583ResponseMessage())
                             {
-                                Log.Write("GetLastPrintDetailResponse message", "MSGComm");  // V26.1.1.3
+                                Log.Write("GetLastPrintDetailResponse message", "MSGComm");
                                 for (int iIterator = 2; iIterator < 128; iIterator++)
                                 {
                                     if (!objISO[iIterator].strValue.equals(""))
@@ -1238,10 +1227,9 @@ public class Timer implements Runnable {
                                     //if field 125 contains error
                                     if (objISO[125].strValue.contains("Error"))
                                     {
-                                        bThreadProtection = false;  //  added in V260.1.1.13  9 dec 2015
-                                        //send error no by ading 2000 to it
+                                        bThreadProtection = false;
+                                        //send error no by adding 2000 to it
                                         objTaskState = Task.TransactionError; errorCode = 2000 + Integer.parseInt(objISO[125].strValue.substring(14,3));
-//                                        PostMessage(GlobalMembers.MainHandle, TransactionError, IntPtr.Zero, (IntPtr)(2000 + Convert.ToInt32(GlobalMembers.objISO[125].strValue.Substring(14, 3))));
                                     }
                                     //is STAN to be matched then is it matched
                                     else if (!bIsSTANMatch || Last_STAN.equals(objISO[11].strValue))
@@ -1249,20 +1237,18 @@ public class Timer implements Runnable {
                                         //update the STAN
                                         UpdateSTAN();
 
-                                        bThreadProtection = false;  //  added in V260.1.1.13  9 dec 2015
+                                        bThreadProtection = false;
                                         //send data request
                                         objTaskState = Task.PassbookDataRequest;
-//                                        PostMessage(GlobalMembers.MainHandle, PassbookDataRequest, IntPtr.Zero, IntPtr.Zero);
                                     }
                                     else
                                     {
                                         lblErrorCode.setText("");//29
                                         lblErrorCode.setVisible(true);
 
-                                        bThreadProtection = false;  //  added in V260.1.1.13  9 dec 2015
+                                        bThreadProtection = false;
                                         //STAN mismatch error
                                         objTaskState = Task.TransactionError; errorCode = 1005;
-//                                        PostMessage(GlobalMembers.MainHandle, TransactionError, IntPtr.Zero, (IntPtr)1005);
                                     }
                                 }
                                 else
@@ -1271,10 +1257,9 @@ public class Timer implements Runnable {
                                     UpdateSTAN();
                                     Log.Write("GETLASTPRINTDETAIL RESPONSE COMES WITH ERROR FROM CBS, ERROR IS " + objISO[39].strValue);
 
-                                    bThreadProtection = false;  //  added in V260.1.1.13  9 dec 2015
+                                    bThreadProtection = false;
                                     //show error came
                                     objTaskState = Task.TransactionError; errorCode = Integer.parseInt(objISO[39].strValue);
-//                                    PostMessage(GlobalMembers.MainHandle, TransactionError, IntPtr.Zero, (IntPtr)(Convert.ToInt32(GlobalMembers.objISO[39].strValue)));
                                 }
                             }
                             else
@@ -1285,9 +1270,8 @@ public class Timer implements Runnable {
 
                                 //show msg format error
                                 Log.Write("GetLastPrintDetailResponse message format error- "+strErrorMsg , "MSGComm");
-                                bThreadProtection = false;  //  added in V260.1.1.13  9 dec 2015
+                                bThreadProtection = false;
                                 objTaskState = Task.TransactionError; errorCode = 1006;
-//                                PostMessage(GlobalMembers.MainHandle, TransactionError, IntPtr.Zero, (IntPtr)1006);
                             }
                         }
                         catch (Exception ex)
@@ -1296,7 +1280,6 @@ public class Timer implements Runnable {
 
                             bThreadProtection = false;
                             objTaskState = Task.TransactionEnd;
-//                            PostMessage(GlobalMembers.MainHandle, TransactionEnd, IntPtr.Zero, IntPtr.Zero);
                         }
                     }
                     break;
@@ -1314,20 +1297,18 @@ public class Timer implements Runnable {
                                 bMoreData = false;
                                 //GlobalMembers.bThreadProtection = false;
 
-                                //if pending txns are avlbl on CBS then send re-request else end the txn //for V12.5.4.7
+                                //if pending txns are avlbl on CBS then send re-request else end the txn
                                 if (bNextRequest)
                                 {
-                                    //send authentication request //for V12.5.4.0
+                                    //send authentication request
                                     bThreadProtection = false;
                                     objTaskState = Task.AuthenticationRequest;
-//                                    PostMessage(GlobalMembers.MainHandle, AuthenticationTransactionRequest, IntPtr.Zero, IntPtr.Zero);
                                 }
                                 else
                                 {
 
                                     bThreadProtection = false;
                                     objTaskState = Task.TransactionEnd;
-//                                    PostMessage(GlobalMembers.MainHandle, TransactionEnd, IntPtr.Zero, IntPtr.Zero);    //V12.5.4.14
                                 }
                             }
                             else
@@ -1356,7 +1337,6 @@ public class Timer implements Runnable {
 //                                        //Error message passbook jam
 //                                        GlobalMembers.bThreadProtection = false;
                                         objTaskState = Task.TransactionError; errorCode =1004;
-////                                        PostMessage(GlobalMembers.MainHandle, TransactionError, IntPtr.Zero, (IntPtr)1004);
 //                                    }
                                 }
                                 else
@@ -1381,7 +1361,6 @@ public class Timer implements Runnable {
 //                                        //Error message passbook jam
 //                                        GlobalMembers.bThreadProtection = false;
                                         objTaskState = Task.TransactionError; errorCode = 1004;
-////                                        PostMessage(GlobalMembers.MainHandle, TransactionError, IntPtr.Zero, (IntPtr)1004);
 //                                    }
                                 }
                             }
@@ -1405,9 +1384,8 @@ public class Timer implements Runnable {
                         {
                             //try read dummy accno for demo purpose
                             strBarcode = objLksdbIni.get("DEMO", "Dummy_Acc_No");
-                            bThreadProtection = false;  //  added in V260.1.1.13  9 dec 2015
+                            bThreadProtection = false;
                             objTaskState = Task.AuthenticationRequest;
-//                            PostMessage(GlobalMembers.MainHandle, AuthenticationTransactionRequest, IntPtr.Zero, IntPtr.Zero);
                         }
                         else
                         {
@@ -1448,7 +1426,7 @@ public class Timer implements Runnable {
                             objISO[102].strValue = "112        " + AccountNumber.substring(0, 4) + "     " + AccountNumber + "   ";// GlobalMembers.strAccountNumber;
                             objISO[123].strValue = "KSK";
                             objISO[125].strValue = "KIOSKPB3";
-                            Log.Write("PassbookCoverPageAckRequest message", "MSGComm");  // V26.1.2.4
+                            Log.Write("PassbookCoverPageAckRequest message", "MSGComm");
                             for (int iIterator = 2; iIterator < 128; iIterator++)
                             {
                                 if (!objISO[iIterator].strValue.equals(""))
@@ -1499,7 +1477,6 @@ public class Timer implements Runnable {
                                 Log.Write("PassbookCoverPageAckRequest message format error- " +strErrorMsg, "MSGComm");
                                 bThreadProtection = false;
                                 objTaskState = Task.TransactionEnd;
-//                                PostMessage(GlobalMembers.MainHandle, TransactionEnd, IntPtr.Zero, IntPtr.Zero);
                             }
                         }
                         catch (Exception ex)
@@ -1528,7 +1505,7 @@ public class Timer implements Runnable {
 
                             if (ISOMsgParser.FilterISO8583ResponseMessage())
                             {
-                                Log.Write("PassbookCoverACKResponse message", "MSGComm");  // V26.1.2.4
+                                Log.Write("PassbookCoverACKResponse message", "MSGComm");
                                 for (int iIterator = 2; iIterator < 128; iIterator++)
                                 {
                                     if (!objISO[iIterator].strValue.equals(""))
@@ -1541,13 +1518,11 @@ public class Timer implements Runnable {
                                 {
                                     bThreadProtection = false;
                                     objTaskState = Task.TransactionEnd; errorCode = 2;
-//                                    PostMessage(GlobalMembers.MainHandle, TransactionEnd, (IntPtr)2, IntPtr.Zero);
                                 }
                                 else
                                 {
                                     bThreadProtection = false;
                                     objTaskState = Task.TransactionError;
-//                                    PostMessage(GlobalMembers.MainHandle, TransactionError, IntPtr.Zero, (IntPtr)1006);
                                 }
                             }
                         }

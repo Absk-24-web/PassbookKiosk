@@ -173,6 +173,13 @@ class Log
 
    }
 
+//     <summary>
+//     It will write the MIS file for transactions
+//     </summary>
+//     <param name="strSTAN">STAN no of the transaction session</param>
+//     <param name="strAccNo">Account number for the transaction session</param>
+//     <param name="strLTP">Lines to print</param>
+//     <param name="strResult">Result tof the transaction session</param>
     public static void WriteMISData(String strSTAN, String strAccNo, String strLTP, String strResult)
     {
         try
@@ -216,67 +223,11 @@ class Log
             fr = new FileWriter(myFile, true);
             fr.write(str);
             fr.close();
-
-
         }
         catch (Exception excp)
         {
             Log.Write("Exception in MISData:-"+excp.getMessage());
         }
     }
-
-
-
-//    public static void Write(String LogData, String fields) {
-//        try
-//        {
-////			System.out.println(LogData);
-//
-//            DateFormat date = new SimpleDateFormat("dd-MM-yyyy");
-//            Date dateparse = new Date();
-//
-//            String Path = "C:\\Kiosk_test\\"+fields;
-//            File dir = new File(Path);
-//
-//            if (!dir.exists())
-//            {
-//                if (dir.mkdirs())
-//                {
-//                    Log.Write("ClientLogs Log Directory Is Created Successfully!");
-//                }
-//                else
-//                {
-//                    Log.Write("ClientLogs Failed to create multiple directories!");
-//                }
-//            }
-//
-//            File myFile = new File("C:\\Kiosk_test\\"+fields+"\\MSGCOMM_" + date.format(dateparse) + ".txt");
-//
-//            if (myFile.createNewFile())
-//            {
-////				 System.out.println("File is created!");
-//            }
-//            else
-//            {
-////				 System.out.println("File already exists.");
-//            }
-//            DateFormat timeparse = new SimpleDateFormat("HH:mm:ss");
-//            Date time = new Date();
-//
-//            LogData = timeparse.format(time) + ":- " + LogData + "\n";
-//
-//            // File file = new File(Path);
-//            FileWriter fr = null;
-//            fr = new FileWriter(myFile, true);
-//            fr.write(LogData);
-//            fr.close();
-//        }
-//        catch (IOException e)
-//        {
-//            //e.printStackTrace();
-//        }
-//
-//    }
-
 
 }

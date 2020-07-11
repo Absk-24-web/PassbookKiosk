@@ -124,7 +124,8 @@ public static void main(String[] args) {
     //left pading
 //    String result = String.format("%9s", "str").replace(' ','0');
     //right pading
-    String result = String.format("%9s", "str");
+    int a = 5;
+    String result = String.format("%"+a+"s", "str");
     System.out.println(result);
 
 

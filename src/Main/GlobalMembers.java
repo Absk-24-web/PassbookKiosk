@@ -1,8 +1,6 @@
 package Main;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type;
 import org.ini4j.Wini;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
@@ -15,27 +13,18 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public  class GlobalMembers {
     public static String dirPath;
-    private static PlaySound playSound;
 
 
     static {
         try{
             dirPath = System.getProperty("user.dir");
             new GlobalMembers();
-//            System.setProperty("java.library.path", "C:\\Users\\df-dev16\\IdeaProjects\\PassbookKisok\\src\\DLL");
-//            System.out.println(System.getProperty("java.library.path"));
-//            System.loadLibrary("LTRD");
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
 
-
-
-//    public static native long InitTRC(IntPtr hWnd);
-
-    public static native boolean LPTRC_MENWrite(String data);
     public static JLabel imgLabel;
     public static JLabel txtLabel;
     public static JLabel time;
@@ -56,7 +45,6 @@ public  class GlobalMembers {
     public static String[] strMISPath;
     public static String strImagesPath;
     public static String strAudioPath;
-//    public static IntPtr MainHandle;
     public static String strBarcode;
     public static String strPrevBarcode;
     public static boolean bIsNewTransaction;
@@ -66,7 +54,6 @@ public  class GlobalMembers {
 
     //client
     public static Socket client;
-
 
 
     enum Task
@@ -101,9 +88,6 @@ public  class GlobalMembers {
     }
 
 
-//     <summary>
-//        //V26.1.1.1 added by Rajesh
-//     </summary>
     public enum MsgLenType
     {
         ASCII,
@@ -114,7 +98,7 @@ public  class GlobalMembers {
     /// <summary>
     /// kiosk Id
     /// </summary>
-    public static String KioskID; //V26.1.1.0
+    public static String KioskID;
 
     //Request type object
     public static MsgLenType eMsgLenType;
@@ -141,7 +125,6 @@ public  class GlobalMembers {
     public static int iThreadforIndexing = 0;
     public static String strErrorMsg = "";
 
-    //Lokesh Added
     public static int strPBHeight;
     public static int strPBWidth;
 
@@ -151,9 +134,9 @@ public  class GlobalMembers {
     public static int iSpacesAfterDebitAmount = 0;
     public static int iSpacesAfterCreditAmount = 0;
 
-    public static boolean isCoverPage;     //V26.1.2.9
+    public static boolean isCoverPage;
 
-    public static int iSpacesBeforeDate = 0; //V26.1.1.31
+    public static int iSpacesBeforeDate = 0;
 
 
     public static boolean bIsPassbookEpson = true;
@@ -181,8 +164,6 @@ public  class GlobalMembers {
     /// TRUE when passbook printing data is composed successfully and printing also done with success, FALSE when error occurs and needs to send negative ACK.
     /// </summary>
     public static boolean bIsPositiveACK = false;
-
-    //public static boolean CheckForConnection = false;    //Removed in V1.1.1.1
 
     public static byte[] bResponse;
     public static byte[] bRequest;
@@ -219,38 +200,8 @@ public  class GlobalMembers {
     public static KIOSK_TIMERS objKioskTimers;
     public static LAST_TXN_DETAILS objLastTxnDetails;
 
-    //Memory queue for log writing
-    public static ConcurrentLinkedQueue<LogStructure> LogQueue;
-    //Memory queue for MIS writing
-    public static ConcurrentLinkedQueue<MISStructure> MISQueue;
-
-    //class for log writing
-    public static class LogStructure
-    {
-        public byte[] byLogText;
-        public String strLogText;
-        public String strDirectory;
-        public boolean bIsLogInString;
-        public LocalDateTime dtLogTime;
-    }
-
-    //class for MIS writing
-    public static class MISStructure
-    {
-        public String strSTAN;
-        public String strAccNo;
-        public String strLTP;
-        public String strResult;
-        public LocalDateTime dtLogTime;
-    }
-
     public static String[] arEnglishScreenText = null;
     public static String[] arRegionalScreenText = null;
-
-    //Event notifier for log
-//    public static AutoResetEvent queueNotifierLog = new AutoResetEvent(false);
-    //Event notifier for MIS
-//    public static AutoResetEvent queueNotifierMIS = new AutoResetEvent(false);
 
     //thread for log writing
     public static Thread thrdLogQueueCallback;
@@ -285,23 +236,11 @@ public  class GlobalMembers {
     public static String Last_STAN;
 
 
-
-    //For Demo purpose
-    /// <summary>
-    /// FALSE if no need to write log
-    /// </summary>
-    //public static boolean bIsWriteLog;
-
     //For Demo purpose
     /// <summary>
     /// FALSE if no need to match the STAN, TRUE if STAN is to be matched (also when value not exist in configuration file).
     /// </summary>
     public static boolean bIsSTANMatch;
-
-    /// <summary>
-    /// TRUE if already printed page is to be checked, FALSE if want to skip this checking (for DEMO mode only)
-    /// </summary>
-    //public static boolean bIsCheckPrintedLines;
 
     /// <summary>
     /// In case of DEMO read account number from configuration file.
@@ -366,7 +305,6 @@ public  class GlobalMembers {
     {
         public String strPassbook_Image_Path;
         public String Passbook_Reference_Image_Path;
-        //public String Log_Path;   //05May14
         public String strBackup_EJ_Path;
         public boolean Mirror_Required;
     }
@@ -378,11 +316,6 @@ public  class GlobalMembers {
         public int iExtra_Line_Feed;
     }
 
-    //public struct LAST_PRINT_DETAIL
-    //{
-    //    public int iLineNo;
-    //    public int iPendingTxns;
-    //}
 
     public static class PB_ACK_DETAILS
     {
@@ -481,11 +414,6 @@ public  class GlobalMembers {
     // instance constructor is invoked or member is accessed.
     GlobalMembers()
     {
-        if (LogQueue == null)
-            LogQueue = new ConcurrentLinkedQueue<>();
-//
-        if (MISQueue == null)
-            MISQueue = new ConcurrentLinkedQueue<>();
 
         objISO = new ISOFields[131];
         for (int i=0; i<=128; i++){
@@ -650,27 +578,13 @@ public  class GlobalMembers {
         strMISPath[1] = "C:\\Kiosk\\Log_Data\\PB_MIS_REPORT";
     }
 
-
-
-    /// <summary>
-    /// It will write the MIS file for transactions
-    /// </summary>
-    /// <param name="strSTAN">STAN no of the transaction session</param>
-    /// <param name="strAccNo">Account number for the transaction session</param>
-    /// <param name="strLTP">Lines to print</param>
-    /// <param name="strResult">Result tof the transaction session</param>
-
-
     public static void ResetISOFields() {
-//        //Shubhit
 
         bRequest = new  byte[0];
-        bRequest = Arrays.copyOf(bRequest,0);
-//        Array.Clear(bRequest, 0, bRequest.Length);
+        bRequest = Arrays.copyOf(bRequest,0); //array resize
 
         bResponse = new  byte[0];
-        bResponse = Arrays.copyOf(bResponse,0);
-//        Array.Clear(bResposne, 0, bResposne.Length);
+        bResponse = Arrays.copyOf(bResponse,0);  //array resize
 
 
         strDefMTI = "";
@@ -688,6 +602,11 @@ public  class GlobalMembers {
                 BufferedImage  imgBuffered = ImageIO.read(new File(dirPath+"/src/Image/Background.jpg"));
                 imageIcon = new ImageIcon(imgBuffered);
             }
+            else {
+                BufferedImage  imgBuffered = ImageIO.read(new File(dirPath+"/src/Image/"+imageName+".jpg"));
+                imageIcon = new ImageIcon(imgBuffered);
+            }
+
             Log.Write(dirPath + "\\src\\Image\\" + imageName + ".JPG image shown");
         } catch (IOException e) {
           Log.Write("Execption in Display image:-"+imageName+" "+e.toString());
@@ -701,8 +620,9 @@ public  class GlobalMembers {
         try
         {
             GlobalMembers.imgLabel.setVisible(true);
-//            pbxBackground.Image = Image.FromFile(GlobalMembers.strImagesPath + "\\Background" + ".jpg");
-            GlobalMembers.imgLabel.setIcon(GlobalMembers.DisplayImage(ImageName));
+            BufferedImage  imgBuffered = ImageIO.read(new File(dirPath+"/src/Image/Background.jpg"));
+             ImageIcon imageIcon = new ImageIcon(imgBuffered);
+            GlobalMembers.imgLabel.setIcon(imageIcon);
 
             lblImageErr1.setVisible(false); lblImageErr2.setVisible(false);
 
@@ -711,12 +631,13 @@ public  class GlobalMembers {
             if (!strErrorMsg.equals(""))
             {
                 lblMarathiScreenText.setText("");
+                // todo arRegionalScreenText
 //                lblMarathiScreenText.Top = 300;
-                lblMarathiScreenText.setText(GlobalMembers.arRegionalScreenText[name]);
+//                lblMarathiScreenText.setText(GlobalMembers.arRegionalScreenText[name]);
 
                 lblEnglishScreenText.setText("");
 //                lblEnglishScreenText.Top = lblMarathiScreenText.Top + 110;
-                lblEnglishScreenText.setText(GlobalMembers.arEnglishScreenText[name]);
+//                lblEnglishScreenText.setText(GlobalMembers.arEnglishScreenText[name]);
 
 
                 lblEnglishScreenText.setVisible(true);
@@ -738,11 +659,11 @@ public  class GlobalMembers {
 
                 lblMarathiScreenText.setText("");
 //                lblMarathiScreenText.Top = 300;
-                lblMarathiScreenText.setText(GlobalMembers.arRegionalScreenText[name]);
+//                lblMarathiScreenText.setText(GlobalMembers.arRegionalScreenText[name]);
 
                 lblEnglishScreenText.setText("");
 //                lblEnglishScreenText.Top = lblMarathiScreenText.Top +  110;
-                lblEnglishScreenText.setText(GlobalMembers.arEnglishScreenText[name]);
+//                lblEnglishScreenText.setText(GlobalMembers.arEnglishScreenText[name]);
 
 
                 lblEnglishScreenText.setVisible(true);
@@ -754,16 +675,15 @@ public  class GlobalMembers {
             if (!ImageName.equals("K002"))
             {
                 // play the sound from the selected filename
-
                 if (bSync){
                     PlaySound.filePath = GlobalMembers.strAudioPath + "\\" + ImageName + ".wav";
-                    playSound = new PlaySound();
-                    PlaySound.play();
+                    PlaySound playSound = new PlaySound();
+                    playSound.play();
                 }
                 else{
                     PlaySound.filePath =  GlobalMembers.strAudioPath + "\\" + ImageName + ".wav";
-                    playSound = new PlaySound();
-                    PlaySound.play();
+                    PlaySound playSound = new PlaySound();
+                    playSound.play();
                 }
             }
         }

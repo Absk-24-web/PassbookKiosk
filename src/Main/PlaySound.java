@@ -46,7 +46,7 @@ public class PlaySound
 	
 	
 	// Method to play the audio 
-	public static void play()
+	public  void play()
 	{ 
 		//start the clip 
 		clip.start(); 

@@ -100,6 +100,32 @@ public class Main extends JFrame {
         GlobalMembers.time.setFont(new Font("Serif", Font.BOLD, 30));
         GlobalMembers.imgLabel.add(GlobalMembers.time);
 
+        GlobalMembers.lblImageErr1 = new JLabel();
+        GlobalMembers.lblImageErr1.setBounds(0, 0, 1368, 768);
+        GlobalMembers.lblImageErr1.setHorizontalAlignment(SwingConstants.LEFT);
+        GlobalMembers.lblImageErr1.setVerticalAlignment(SwingConstants.TOP);
+//        GlobalMembers.lblImageErr1.setIcon(image);
+
+        GlobalMembers.lblImageErr2 = new JLabel();
+        GlobalMembers.lblImageErr2.setBounds(0, 0, 1368, 768);
+        GlobalMembers.lblImageErr2.setHorizontalAlignment(SwingConstants.LEFT);
+        GlobalMembers.lblImageErr2.setVerticalAlignment(SwingConstants.TOP);
+
+        GlobalMembers.lblMarathiScreenText = new JLabel();
+        GlobalMembers.lblMarathiScreenText.setBounds(0, 0, 1368, 768);
+        GlobalMembers.lblMarathiScreenText.setHorizontalAlignment(SwingConstants.LEFT);
+        GlobalMembers.lblMarathiScreenText.setVerticalAlignment(SwingConstants.TOP);
+
+        GlobalMembers.lblEnglishScreenText = new JLabel();
+        GlobalMembers.lblEnglishScreenText.setBounds(0, 0, 1368, 768);
+        GlobalMembers.lblEnglishScreenText.setHorizontalAlignment(SwingConstants.LEFT);
+        GlobalMembers.lblEnglishScreenText.setVerticalAlignment(SwingConstants.TOP);
+
+        GlobalMembers.lblErrorCode = new JLabel();
+        GlobalMembers.lblErrorCode.setBounds(0, 0, 1368, 768);
+        GlobalMembers.lblErrorCode.setHorizontalAlignment(SwingConstants.LEFT);
+        GlobalMembers.lblErrorCode.setVerticalAlignment(SwingConstants.TOP);
+
         Icon enIcon = new ImageIcon(dirPath+"\\src\\Image\\English.png");
         JButton engButton = new JButton(enIcon);
         engButton.setBounds(1050,500,270,70);
@@ -171,7 +197,7 @@ public class Main extends JFrame {
                 GlobalMembers.objCBS.strHost_Name = GlobalMembers.objCnctnIni.get("CBS", "Host_Name");
 
 
-                                 //Todo
+                                 //Todo CBS
 //                                if (GlobalMembers.objCnctnIni.get("CBS", "Is_DNS").equals(""))
 //                                {
 //                                    if (ConfigurationManager.AppSettings["Is_DNS"] != null && ConfigurationManager.AppSettings["Is_DNS"] != "")
@@ -233,6 +259,7 @@ public class Main extends JFrame {
 //                    region STAN
                 GlobalMembers.STAN = objLksdbIni.get("TXN", "STAN");
                 if (GlobalMembers.STAN.equals("") || Integer.parseInt(GlobalMembers.STAN) == 0)
+                    GlobalMembers.STAN =  objLksdbIni.put("TXN","STAN",String.format("%"+GlobalMembers.objISO[11].iLength+"s","1"));
 //                    GlobalMembers.STAN = objLksdbIni.put("TXN", "STAN", (1).ToString("D" + GlobalMembers.objISO[11].iLength));
 //                    endregion
 
@@ -256,8 +283,6 @@ public class Main extends JFrame {
 
 //                    region Version settings
                 GlobalMembers.objVERSION.App_Ver = objLksdbIni.get("VERSION", "App_Ver");
-                //if (GlobalMembers.objVERSION.App_Ver == "")//Comment by Amit Khabya 2Aug2018
-//                                GlobalMembers.objVERSION.App_Ver = objLksdbIni.put("VERSION", "App_Ver", "BMC Bank V" + System.Diagnostics.FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).FileVersion); //V26.1.1.0
 
                 GlobalMembers.objVERSION.Ghost_ver = objLksdbIni.get("VERSION", "Ghost_ver");
                 if (GlobalMembers.objVERSION.Ghost_ver.equals(""))
@@ -321,7 +346,6 @@ public class Main extends JFrame {
                 if (GlobalMembers.objACCOUNT_DETAILS.iMax_Line_To_Print == 0)
                     GlobalMembers.objACCOUNT_DETAILS.iMax_Line_To_Print = Integer.parseInt(objLksdbIni.put("ACCOUNT_DETAILS", "Max_Line_To_Print", "22"));
 
-                //Modified for V1.1.3.0
                 if (objLksdbIni.get("ACCOUNT_DETAILS", "Extra_Line_Feed").equals(""))
                     GlobalMembers.objACCOUNT_DETAILS.iExtra_Line_Feed = Integer.parseInt(objLksdbIni.put("ACCOUNT_DETAILS", "Extra_Line_Feed", "5"));
                 else
@@ -402,7 +426,7 @@ public class Main extends JFrame {
                     GlobalMembers.strPBWidth = Integer.parseInt(objLksdbIni.put("FORMAT_DETAILS", "PB_Width", "2200")); //V26.1.1.0
 
 
-                //V26.1.1.31
+
                 GlobalMembers.iSpacesBeforeDate = Integer.parseInt(objLksdbIni.get("FORMAT_DETAILS", "SpacesBeforeDate"));
                 if (GlobalMembers.iSpacesBeforeDate == 0)
                     GlobalMembers.iSpacesBeforeDate = Integer.parseInt(objLksdbIni.put("FORMAT_DETAILS", "SpacesBeforeDate", "3")); //V26.1.1.0
@@ -437,7 +461,7 @@ public class Main extends JFrame {
                 if (GlobalMembers.objKioskTimers.iTmrRotator7 == 0)
                     GlobalMembers.objKioskTimers.iTmrRotator7 = Integer.parseInt(objLksdbIni.put("TIMERS", "ROTATOR7", "10"));
 
-                //Condition updated for V1.1.3.0
+                //Condition updated
                 GlobalMembers.objKioskTimers.iTmrTransaction = Integer.parseInt(objLksdbIni.get("TIMERS", "TRANSACTION"));
                 if (GlobalMembers.objKioskTimers.iTmrTransaction == 0 || GlobalMembers.objKioskTimers.iTmrTransaction == 10)
                     GlobalMembers.objKioskTimers.iTmrTransaction = Integer.parseInt(objLksdbIni.put("TIMERS", "TRANSACTION", "40"));
@@ -514,6 +538,7 @@ public class Main extends JFrame {
                 boolean Status = false;
                 if (!GlobalMembers.bIsPassbookEpson)
                 {
+                    //todo printer
 //                    if (Ollivtti_Obj == null)
 //                        Ollivtti_Obj = new Ollivetti();
 //
@@ -534,17 +559,16 @@ public class Main extends JFrame {
                   Log.Write("Passbook Status = Connected");
                     GlobalMembers.txtLabel.setText("Passbook Printer Connected....");
 
-                    //For RMS //V26.1.2.9
+
                     objHealthIni.put("Health_Details" , "0", "Passbook");
                     objHealthIni.put("Health_Details", "Changes_DoneHealth", "1");
-//                    return true;
                 }
                 else
                 {
                     AppInitCount = 0;
 //                    tmrInitialize.Enabled = false;
 
-                    //For RMS //V26.1.2.9
+
                     objHealthIni.put("Health_Details" , "1", "Passbook");
                     objHealthIni.put("Health_Details", "Changes_DoneHealth", "1");
 
@@ -554,11 +578,14 @@ public class Main extends JFrame {
 
 //                    tmrPassbookCheck.Enabled = true;
 
-//                    lblEnglishScreenText.Visible = false;
-//                    lblMarathiScreenText.Visible = false;
-//                    lblText.Visible = lblTime.Visible = lblAppVersion.Visible = false;
-//                    pbxBackground.Image = Image.FromFile(Application.StartupPath + "\\Lipi\\OOOS\\001.JPG");  //05May14
-//                    return false;
+                    GlobalMembers.lblEnglishScreenText.setVisible(false);
+                    GlobalMembers.lblMarathiScreenText.setVisible(false);
+                    GlobalMembers.headingLabel.setVisible(false);
+                    GlobalMembers.txtLabel.setVisible(false);
+                    GlobalMembers.time.setVisible(false);
+                    BufferedImage imgBuffered=ImageIO.read(new File(dirPath+"/src/Image/001.JPG"));
+                    ImageIcon oooS = new ImageIcon(imgBuffered);
+                    GlobalMembers.imgLabel.setIcon(oooS);
                 }
             }
             else
@@ -570,7 +597,6 @@ public class Main extends JFrame {
                 objHealthIni.put("Health_Details", "Changes_DoneHealth", "1");
             }
 
-//            Application.launch();
             Thread.sleep(2000);
 
 
@@ -585,7 +611,6 @@ public class Main extends JFrame {
                 GlobalMembers.txtLabel.setText("Connectivity with RMS Server Failed....Connect RMS Client First");
                 Log.Write("Checking RMS connectivity- Failed");
                 Log.Write("CHECKING RMS CONNECTIVITY- FAILED" );
-//                return false;
             }
 
             GlobalMembers.txtLabel.setText("Connected with RMS Server....");
@@ -614,7 +639,7 @@ public class Main extends JFrame {
                     Log.Write("CONNECTION VIA TCP/IP");
                     if (GlobalMembers.client == null)
                     {
-                        //Added[12Sept2013] To resolve DNS and to get IP
+                        //Added To resolve DNS and to get IP
                         if (GlobalMembers.objCBS.bIs_DNS)
                         {
                             //Todo
@@ -629,7 +654,7 @@ public class Main extends JFrame {
                             Log.Write("CONNECTION VIA TCP/IP AND DNS IS NOT ENABLED");
                         }
 
-                        //For RMS //V26.1.2.9
+
                         objHealthIni.put("Health_Details", "Application", "0");
                         objHealthIni.put("Health_Details", "Changes_DoneHealth", "1");
 
@@ -649,7 +674,6 @@ public class Main extends JFrame {
                     Log.Write("TCP Connection not established = " + excp.getMessage());
                     Log.Write("CONNECTION WITH CBS IS NOT ESTLABLISHED" );
 
-//                    lblAppVersion.Visible = lblText.Visible = lblTime.Visible = false;
                     GlobalMembers.time.setVisible(false); GlobalMembers.txtLabel.setVisible(false); GlobalMembers.headingLabel.setVisible(false);
                     BufferedImage imgBuffered=ImageIO.read(new File(dirPath+"/src/Image/OOOS.JPG"));
                     ImageIcon oooS = new ImageIcon(imgBuffered);
