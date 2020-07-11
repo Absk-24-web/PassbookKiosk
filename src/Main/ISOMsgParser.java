@@ -1,7 +1,5 @@
 package Main;
 
-import com.sun.org.apache.bcel.internal.generic.GotoInstruction;
-
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -52,24 +50,7 @@ public class ISOMsgParser {
         }
         return retHexstr.toString();
     }
-    public static String leftPadding(String input, char ch, int L)
-    {
 
-        String result
-                = String
-
-                // First left pad the string
-                // with space up to length L
-                .format("%" + L + "s", input)
-
-                // Then replace all the spaces
-                // with the given character ch
-                .replace(' ', ch);
-
-        // Return the resultant string
-        return result;
-    }
-    //
     public static String ConvertBinaryToHex(String strBinary)
     {
         StringBuilder strAscii = new StringBuilder();
