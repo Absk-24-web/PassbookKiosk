@@ -1,18 +1,9 @@
 package Testing;
 
-import sun.nio.cs.StandardCharsets;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 
 public class Testing {
-     public static int  iLen =-1;
+    public static int iLen = -1;
 //    public static void main(String[] args) {
 
 //        String main = "F030810128A080000000000004000034";
@@ -33,7 +24,7 @@ public class Testing {
 //        }
 //        System.out.println("count-:"+count);
 
-//        byte [] byRequest = {22,40,50,13,};
+    //        byte [] byRequest = {22,40,50,13,};
 //        byte [] bRequest = new byte[byRequest.length];
 //        System.arraycopy(byRequest,0,bRequest,0,byRequest.length);
 //        for(int i=0; i< bRequest.length ; i++) {
@@ -57,79 +48,58 @@ public class Testing {
 //            return false;
 //        }
 //    }
-public static void main(String[] args) {
 
-//    File file = new File("C:\\Users\\df-dev16\\Desktop\\Auth_Req.dat");
-//    FileInputStream fin = null;
-//    try {
-//        // create FileInputStream object
-//        fin = new FileInputStream(file);
-//
-//        byte[] fileContent = new byte[(int)file.length()];
-//
-//        // Reads up to certain bytes of data from this input stream into an array of bytes.
-//        try {
-//            fin.read(fileContent);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        //create string from byte array
-//        String s = new String(fileContent);
-//        System.out.println("File content: " + Arrays.toString(s.getBytes()));
-//        System.out.println("File content: " + s);
-//    }
-//    catch (FileNotFoundException e) {
-//        System.out.println("File not found" + e);
-//    } finally {
-//        // close the streams using close method
-//        try {
-//            if (fin != null) {
-//                fin.close();
-//            }
-//        }
-//        catch (IOException ioe) {
-//            System.out.println("Error while closing stream: " + ioe);
-//        }
-//    }
 
-//    Path path = Paths.get("C:\\Users\\df-dev16\\Desktop\\Auth_Req.dat");
-//    try {
-//        byte[] data = Files.readAllBytes(path);
-//        System.out.println("File content: " + Arrays.toString(data));
-//    } catch (IOException e) {
-//        e.printStackTrace();
-//    }
-//
-//    File file = new File("C:\\Users\\df-dev16\\Desktop\\Auth_Req.dat");
-////init array with file length
-//    byte[] bytesArray = new byte[(int) file.length()];
-//
-//    FileInputStream fis = null;
-//    try {
-//        fis = new FileInputStream(file);
-//        fis.read(bytesArray); //read file into bytes[]
-//        System.out.println(Arrays.toString(bytesArray));
-//
-//        fis.close();
-//    } catch (IOException e) {
-//        e.printStackTrace();
-//    }
-
+    public static void main(String[] args) {
 
 //        int[] source = { 1, 2, 3, 4, 5, 6, 7 };
 //        int[] destination = new int[source.length];
 //        System.arraycopy(source, 2, destination, 0, source.length-2);
 //        System.out.println(Arrays.toString(destination));
 
-    //left pading
+        //left pading
 //    String result = String.format("%9s", "str").replace(' ','0');
-    //right pading
-    int a = 5;
-    String result = String.format("%"+a+"s", "str");
-    System.out.println(result);
+        //right pading
+//    int a = 5;
+//    String result = String.format("%"+a+"s", "str");
+//    System.out.println(result);
 
 
+//            String value = "00000264555.00";
+//            // Use custom trimEnd and trimStart methods.
+//            System.out.println("[" + trimEnd(value) + "]");
+//            System.out.println("[" + trimStart(value) + "]");
+//            System.out.println("[" + removeLeadingZeroes(value) + "]");
+//
+//}
+//    public static String trimEnd(String value) {
+//    // Use replaceFirst to remove trailing spaces.
+//    return value.replaceFirst("\\s+$", "");
+//}
+//
+//    public static String trimStart(String value) {
+//        // Remove leading spaces.
+//        return value.replaceFirst("^\\s+", "");
+//    }
+//
+//    public static String removeLeadingZeroes(String str) {
+//        String strPattern = "^0+(?!$)";
+//        str = str.replaceAll(strPattern, "");
+//        return str;
+//    }
+        System.out.println(Arrays.toString(ConvertHexToAscii("F030810128A080000000000004000034")));
+//        System.out.println((Arrays.toString(hexToAscii("F030810128A080000000000004000034"))));
 
-}
+    }
 
+
+    public static byte[] ConvertHexToAscii(String strHex)
+    {
+        // TODO: 13-07-2020  return fixed
+        byte[] Asc = new byte[strHex.length() / 2];
+        for (int i = 0; i < Asc.length; i++) {
+            Asc[i] = (byte) Integer.parseInt(strHex.substring(i*2, i*2+2), 16);
+        }
+        return Asc;
+    }
 }

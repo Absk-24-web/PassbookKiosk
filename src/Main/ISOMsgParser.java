@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 public class ISOMsgParser {
     public static int  iLen = -1;
+
 //     <summary>
 //     It converts Hex value to its corresponding Binary format
 //     </summary>
@@ -27,11 +28,10 @@ public class ISOMsgParser {
 //    /// <returns>ASCII byte array</returns>
     public static byte[] ConvertHexToAscii(String strHex)
     {
-
-        byte[] Asc = {(byte) 240,48, (byte) 129,1,40, (byte) 160, (byte) 128,0,0,0,0,0,4,0,0,52};
-//        byte[] Asc = new byte[strHex.length() / 2];
-//        for (int i = 0; i < Asc.length; i++)
-//           Asc[i] = Byte.parseByte(strHex.substring(i * 2, 2), 16);
+        byte[] Asc = new byte[strHex.length() / 2];
+        for (int i = 0; i < Asc.length; i++) {
+            Asc[i] = (byte) Integer.parseInt(strHex.substring(i*2, i*2+2), 16);
+        }
         return Asc;
     }
 

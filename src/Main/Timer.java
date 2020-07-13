@@ -22,6 +22,9 @@ public class Timer implements Runnable {
     private String[] strTransIdACK = new String[0];
     private String[] strDateACK = new String[0];
     private String[] strTransSerialNoACK = new String[0];
+    private String strBFBalance = "";
+    private String strPrintData = "";
+    private String strFFDBalance = "";
 
         static {
             dirPath = System.getProperty("user.dir");
@@ -116,7 +119,7 @@ public class Timer implements Runnable {
                                 bThreadProtection = false;
                                 objTaskState = Task.AuthenticationRequest;
                             } else {
-                                //todo printer
+                                //// TODO: 13-07-2020   printer
 //                            if (GlobalMembers.bIsPassbookEpson == false)
 //                                Ollivtti_Obj.StartPassbookCheck();
 //                            else
@@ -205,14 +208,7 @@ public class Timer implements Runnable {
                                             Log.Write("AuthenticationRequest message sent", "MSGComm");
                                             Log.Write(bRequest, "MSGComm");
 
-                                            //Receive response by tcp
-                                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                            byte[] buffer = new byte[293];
-                                            baos.write(buffer, 0, input.read(buffer));
-
-                                            bResponse = baos.toByteArray();//ref bResponse
-//                                            String res = Arrays.toString(GlobalMembers.bResponse);
-//                                            System.out.println(res);
+                                                //State change
                                             objTaskState = Task.AuthenticationResponse;
 
                                         } catch (Exception ex) {
@@ -240,7 +236,16 @@ public class Timer implements Runnable {
                     case AuthenticationResponse: {
                         try {
                             bThreadProtection = true;
-//                        timer2.Enabled = false;
+//                            timer2.Enabled = false
+
+                                //Receive response by tcp
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            byte[] buffer = new byte[293];
+                            baos.write(buffer, 0, input.read(buffer));
+                            bResponse = baos.toByteArray(); //ref bResponse
+//                            String res = Arrays.toString(GlobalMembers.bResponse);
+//                            System.out.println(res);
+
                             Log.Write("Authentication response");
                             Log.Write("AuthenticationResponse message received", "MSGComm");
                             Log.Write(bResponse, "MSGComm");
@@ -271,7 +276,7 @@ public class Timer implements Runnable {
                                         bThreadProtection = false;
                                         //send error no by adding 2000 to it
                                         objTaskState = Task.TransactionError;
-                                        //todo substring
+                                        // TODO: 13-07-2020   substring
                                         errorCode = 2000 + Integer.parseInt(objISO[125].strValue.substring(14, 3));
                                     }
                                     //is STAN to be matched then is it matched
@@ -314,7 +319,6 @@ public class Timer implements Runnable {
                     case PassbookDataRequest: {
                         try {
                             bThreadProtection = true;
-
                             bMoreData = false;
                             bNextRequest = false;
                             isCoverPage = false;
@@ -378,14 +382,7 @@ public class Timer implements Runnable {
                                         output.flush();
                                         bThreadProtection = false;
 
-                                        //Receive response
-                                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                        byte[] buffer = new byte[2920];
-                                        baos.write(buffer, 0, input.read(buffer));
-
-                                        bResponse = baos.toByteArray();//ref bResponse
-//                                            String res = Arrays.toString(GlobalMembers.bResposne);
-//                                            System.out.println(res);
+                                            //State change
                                         objTaskState = Task.PassbookDataResponse;
 
                                     } catch (Exception ex) {
@@ -411,6 +408,14 @@ public class Timer implements Runnable {
                         try {
                             bThreadProtection = true;
                             isCoverPage = false;
+
+                            //Receive response
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            byte[] buffer = new byte[2920];
+                            baos.write(buffer, 0, input.read(buffer));
+                            bResponse = baos.toByteArray();//ref bResponse
+//                                            String res = Arrays.toString(GlobalMembers.bResposne);
+//                                            System.out.println(res);
 
                             Log.Write("Passbook Data response");
                             Log.Write("PassbookDataResponse message received", "MSGComm");
@@ -445,21 +450,21 @@ public class Timer implements Runnable {
                                             bTransactionDataReceived = true;
 
                                             String strBuffer = "";
-                                            // TODO: 11-07-2020  composeAndPrint
-//                                            if (ComposeAndPrintData(true,  strBuffer)) {
-//                                                if (GlobalMembers.bIsPassbookEpson == false)
+                                            // TODO: 11-07-2020  printer
+                                            if (ComposeAndPrintData(true,  strBuffer)) {
+//                                                if (!GlobalMembers.bIsPassbookEpson)
 //                                                    Ollivtti_Obj.PrintData(strBuffer);
 //                                                else
 //                                                    EPSON_Obj.PrintData(strBuffer);
-//
-//                                                Log.Write("After Compose Print Data, set bIsPositiveACK = true");
-//                                                GlobalMembers.bIsPositiveACK = true;
-//                                            } else {
-//                                                Log.Write("After Compose Print Data, set bIsPositiveACK = false");
-//                                                GlobalMembers.bIsPositiveACK = false;
-//                                                GlobalMembers.bThreadProtection = false;
+
+                                                Log.Write("After Compose Print Data, set bIsPositiveACK = true");
+                                                GlobalMembers.bIsPositiveACK = true;
+                                            } else {
+                                                Log.Write("After Compose Print Data, set bIsPositiveACK = false");
+                                                GlobalMembers.bIsPositiveACK = false;
+                                                GlobalMembers.bThreadProtection = false;
                                                 objTaskState = Task.TransactionError; errorCode = 1012;
-//                                            }
+                                            }
                                         }
                                     } else {
                                         bThreadProtection = false;
@@ -826,26 +831,26 @@ public class Timer implements Runnable {
 
                                             DisplayImageOnForm("K005", "", true);
 
-                                            //todo composeAndPrintData
+                                            //// TODO: 13-07-2020 Printer
                                             //compose the data and print on passbook, if function failed then send ACK
                                             String strBuffer = "";
-//                                            if (ComposeAndPrintData(false,  strBuffer))
-//                                            {
-//                                                if (GlobalMembers.bIsPassbookEpson == false)
+                                            if (ComposeAndPrintData(false,  strBuffer))
+                                            {
+//                                                if (!GlobalMembers.bIsPassbookEpson)
 //                                                    Ollivtti_Obj.PrintData(strBuffer);
 //                                                else
 //                                                    EPSON_Obj.PrintData(strBuffer);
-//
-//                                                Log.Write("After Compose Print Data, set bIsPositiveACK = true" );
-//                                                GlobalMembers.bIsPositiveACK = true;
-//                                            }
-//                                            else
-//                                            {
-//                                                //Error
-//                                                GlobalMembers.bThreadProtection = false;
-//                                                GlobalMembers.objTaskState = GlobalMembers.Task.TransactionError;
-////                                                PostMessage(GlobalMembers.MainHandle, TransactionError, IntPtr.Zero, IntPtr.Zero);
-//                                            }
+
+                                                Log.Write("After Compose Print Data, set bIsPositiveACK = true" );
+                                                GlobalMembers.bIsPositiveACK = true;
+                                            }
+                                            else
+                                            {
+                                                //Error
+                                                GlobalMembers.bThreadProtection = false;
+                                                GlobalMembers.objTaskState = GlobalMembers.Task.TransactionError;
+//                                                PostMessage(GlobalMembers.MainHandle, TransactionError, IntPtr.Zero, IntPtr.Zero);
+                                            }
                                         }
                                         else
                                         {
@@ -878,7 +883,7 @@ public class Timer implements Runnable {
                                         bIsCheckingBCOrientation = false;
 
                                         String Command = " --raw -q ";
-                                        //todo
+                                        //// TODO: 13-07-2020 barImage 
 //                                        Runtime.getRuntime().exec("C:\\KIOSK\\zbarimg", Command + GlobalMembers.objPATH_DETAIL.strPassbook_Image_Path + "\\R.bmp");
 //                                        commandPrompt = new CommandPrompt("C:\\KIOSK\\zbarimg", Command + GlobalMembers.objPATH_DETAIL.strPassbook_Image_Path + @"\R.bmp");
 
@@ -888,7 +893,7 @@ public class Timer implements Runnable {
                                     }
                                     else
                                     {
-                                            //todo
+                                            //// TODO: 13-07-2020  barImage
 //                                        CropImage(GlobalMembers.objPATH_DETAIL.strPassbook_Image_Path + "\\R.bmp", ImageSplitType.Horizontal);  // V25.1.1.4
 
                                         //  CropImage(GlobalMembers.objPATH_DETAIL.strPassbook_Image_Path + @"\R.bmp", GlobalMembers.objPATH_DETAIL.strPassbook_Image_Path + @"\Reardown.bmp", DOWN_BMP);
@@ -905,7 +910,7 @@ public class Timer implements Runnable {
 //                                            commandPrompt = new CommandPrompt("C:\\KIOSK\\zbarimg", Command + GlobalMembers.objPATH_DETAIL.strPassbook_Image_Path + @"\R_Top.bmp"); //R_Top //R_Bottom  // V25.1.1.4
 //                                            Runtime.getRuntime().exec("C:\\KIOSK\\zbarimg", Command + GlobalMembers.objPATH_DETAIL.strPassbook_Image_Path + "\\R_Top.bmp");
                                             // Run command asynchronously
-                                            //todo
+                                            //// TODO: 13-07-2020 barImage 
 //                                            commandPrompt.OutputDataReceived += Barcode_DataReceived;
 //                                            commandPrompt.BeginRun();
                                         }
@@ -961,7 +966,7 @@ public class Timer implements Runnable {
                             objISO[35].strValue = "9999999999";
 
                             //16 digit Reference No (12 + 4)
-                            objISO[37].strValue = LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyHHmmss"))+ STAN.substring(2); //DateTime.Now.ToString("ddMMyyHHmmss") + GlobalMembers.STAN.Substring(2);
+                            objISO[37].strValue = LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyHHmmss"))+ STAN.substring(2); //DateTime.Now.ToString("ddMMyyHHmmss") + GlobalMembers.STAN.substring(2);
 
                             objISO[41].strValue = "10000000";
                             objISO[43].strValue = "CEDGETHANE-WEST0000000000000000000MHIN00";
@@ -1001,16 +1006,9 @@ public class Timer implements Runnable {
 
                                         //send to server
                                         output.write(bRequest);
+                                        output.flush();
 
-                                        //receive from server
-                                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                        byte[] buffer = new byte[293];
-                                        baos.write(buffer, 0, input.read(buffer));
-
-                                        bResponse = baos.toByteArray();//ref bResponse
-//                                            String res = Arrays.toString(GlobalMembers.bResposne);
-//                                            System.out.println(res);
-
+                                        objTaskState = Task.PassbookNegAckResponse;
                                     }
                                     catch (Exception ex)
                                     {
@@ -1018,7 +1016,7 @@ public class Timer implements Runnable {
                                         Log.Write("PASSBOOK NEGACK REQUEST NOT SENT TO CBS AND STAN IS " + STAN + "  " + ex.getMessage() );
                                         Log.Write("NETWORK DISCONNECTED" );
 
-                                        //todo
+                                        //// TODO: 13-07-2020  checking connectivity
                                         //if network disconnected, try checking for connectivity
 //                                        if (client.CommunicationState == Lipi.Communication.Scs.Communication.CommunicationStates.Disconnected)
 //                                            thrdNetworkNotifier.Set();
@@ -1052,6 +1050,14 @@ public class Timer implements Runnable {
 
 //                            timer2.Enabled = false;
 
+                            //receive from server
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            byte[] buffer = new byte[293];
+                            baos.write(buffer, 0, input.read(buffer));
+                            bResponse = baos.toByteArray();//ref bResponse
+//                                            String res = Arrays.toString(GlobalMembers.bResposne);
+//                                            System.out.println(res);
+
                             Log.Write("Passbook NegACK response");
                             Log.Write("PassbookNegAckResponse message received", "MSGComm");
                             Log.Write(bResponse, "MSGComm");
@@ -1066,7 +1072,7 @@ public class Timer implements Runnable {
                                 Log.Write("PassbookNegAckResponse message", "MSGComm");
                                 for (int iIterator = 2; iIterator < 128; iIterator++)
                                 {
-                                    if (objISO[iIterator].strValue != "")
+                                    if (!objISO[iIterator].strValue.equals(""))
                                     {
                                         Log.Write("Field " + iIterator + " - " + objISO[iIterator].strValue, "MSGComm");
                                     }
@@ -1145,17 +1151,10 @@ public class Timer implements Runnable {
                                     {
                                         //send request by tcp
                                         output.write(bRequest);
+                                        output.flush();
 
-                                        //receive response by tcp
-                                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                        byte[] buffer = new byte[293];
-                                        baos.write(buffer, 0, input.read(buffer));
-
-                                        bResponse = baos.toByteArray();//ref bResponse
-//                                            String res = Arrays.toString(GlobalMembers.bResposne);
-//                                            System.out.println(res);
-
-
+                                            //Change State
+                                        objTaskState =  Task.GetLastPrintDetailResponse;
                                     }
                                     catch (Exception ex)
                                     {
@@ -1198,6 +1197,14 @@ public class Timer implements Runnable {
                             bThreadProtection = true;
 
 //                            timer2.Enabled = false;
+
+                                //receive response by tcp
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            byte[] buffer = new byte[293];
+                            baos.write(buffer, 0, input.read(buffer));
+                            bResponse = baos.toByteArray();//ref bResponse
+//                                            String res = Arrays.toString(GlobalMembers.bResposne);
+//                                            System.out.println(res);
 
                             Log.Write("Get last print detail response");
                             Log.Write("GetLastPrintDetailResponse message received", "MSGComm");
@@ -1317,7 +1324,7 @@ public class Timer implements Runnable {
 
                                 if (!bIsPassbookEpson)
                                 {
-                                    //todo printer
+                                    // TODO: 13-07-2020   printer
 //                                    //eject the passbook
 //                                    if (Ollivtti_Obj.EjectPassbook())
 //                                    {
@@ -1448,15 +1455,10 @@ public class Timer implements Runnable {
                                     {
                                         //send request
                                         output.write(bRequest);
+                                        output.flush();
 
-                                        //receive response
-                                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                        byte[] buffer = new byte[293];
-                                        baos.write(buffer, 0, input.read(buffer));
-
-                                        bResponse = baos.toByteArray();//ref bResponse
-//                                            String res = Arrays.toString(GlobalMembers.bResposne);
-//                                            System.out.println(res);
+                                            //Change State
+                                        objTaskState = Task.PassbookCoverPageAckResponse;
                                   }
                                     catch (Exception ex)
                                     {
@@ -1465,7 +1467,7 @@ public class Timer implements Runnable {
 
                                         Log.Write("NETWORK DISCONNECTED" );
 
-                                        //todo network checking
+                                        // TODO: 13-07-2020   network checking
                                         //if network disconnected, try checking for connectivity
 //                                        if (client.CommunicationState == Lipi.Communication.Scs.Communication.CommunicationStates.Disconnected)
 //                                            thrdNetworkNotifier.Set();
@@ -1495,9 +1497,16 @@ public class Timer implements Runnable {
                         try
                         {
                             bThreadProtection = true;
-
 //                            timer2.Enabled = false;
                             bIsPositiveACK = true;
+
+                            //receive response
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            byte[] buffer = new byte[293];
+                            baos.write(buffer, 0, input.read(buffer));
+                            bResponse = baos.toByteArray();//ref bResponse
+//                                            String res = Arrays.toString(GlobalMembers.bResposne);
+//                                            System.out.println(res);
 
                             Log.Write("CoverPageACK response");
                             Log.Write("PassbookCoverACKResponse message received", "MSGComm");
@@ -1548,6 +1557,474 @@ public class Timer implements Runnable {
             GlobalMembers.STAN = "000" + GlobalMembers.STAN;
             objLksdbIni.put("TXN", "STAN", GlobalMembers.STAN);
         }
+    }
+
+    public boolean ComposeAndPrintData(boolean bComposeRequired,  String strComposedData)
+    {
+        String strErrorMsg = "";
+        strComposedData = "";
+        try
+        {
+            String strDate, strParticular, strChqNo, strTxnAmnt, strCrAmnt, strDbAmnt, strEndBalance, strDrCrIndicator;
+            strDate = strParticular = strChqNo = strTxnAmnt = strCrAmnt = strDbAmnt = strEndBalance = strDrCrIndicator = "";
+
+            if (bComposeRequired)
+            {
+                strBFBalance = "";
+                strPrintData = GlobalMembers.objISO[125].strValue + GlobalMembers.objISO[126].strValue + GlobalMembers.objISO[127].strValue;
+
+                strFFDBalance = GlobalMembers.objISO[72].strValue;
+
+                if (strPrintData.length()== 0)
+                    return false;
+
+                //read the character to identify more pending txns on CBS
+                if (strPrintData.substring(0, 1).equals("Y"))
+                {
+                    GlobalMembers.bNextRequest = true;
+                    GlobalMembers.bMoreData = true;
+                    strFFDBalance = "";
+                }
+
+                //trim the character to identify more pending txns on CBS
+                strPrintData = strPrintData.substring(1);
+
+
+                //trim 2 bytes for number of transactions came
+                strPrintData = strPrintData.substring(2);
+
+                for (int iIndex = 0, iLocation = 0; iIndex < strPrintData.length() && strPrintData.length() > 2; iLocation += GlobalMembers.iNoOfByteInSingleLine, iIndex++)
+                {
+
+                    Arrays.copyOf(strTxnLine,strTxnLine.length+1);
+                    Arrays.copyOf(strTxnPostedDateACK,strTxnPostedDateACK.length+1);
+                    Arrays.copyOf(strEndBalanceACK,strEndBalanceACK.length+1);
+                    Arrays.copyOf(strTransIdACK,strTransIdACK.length+1);
+                    Arrays.copyOf(strDateACK,strDateACK.length+1);
+                    Arrays.copyOf(strTransSerialNoACK,strTransSerialNoACK.length+1);
+
+                    if (strPrintData.length() > GlobalMembers.iNoOfByteInSingleLine)
+                        strTxnLine[iIndex] = strPrintData.substring(0, GlobalMembers.iNoOfByteInSingleLine);
+                    else
+                        strTxnLine[iIndex] = strPrintData;
+
+                    strErrorMsg = "Print data taken at " + iIndex + " location";
+
+                    //For date field
+                    if (strTxnLine[iIndex].length() >= GlobalMembers.iDateFieldSize)
+                    {
+                        if (!strTxnLine[iIndex].contains("User-Id"))
+                        {
+                            //to hold date in array for sending in ACK
+                            strDateACK[iIndex] = strTxnLine[iIndex].substring(0, GlobalMembers.iDateFieldSize);
+
+                            strDate = strTxnLine[iIndex].substring(0, GlobalMembers.iDateFieldSize);
+                            strTxnLine[iIndex] = strTxnLine[iIndex].substring(GlobalMembers.iDateFieldSize);
+                        }
+                        else
+                        {
+                            String strTempData = "";
+                            //to hold date in array for sending in ACK
+                            strDateACK[iIndex] = strTxnLine[iIndex].substring(0, GlobalMembers.iDateFieldSize);
+                            strDate = strTxnLine[iIndex].substring(0, GlobalMembers.iDateFieldSize);
+                            strTempData = strTxnLine[iIndex].substring(GlobalMembers.iDateFieldSize);
+
+                            String strTempDate = strDate.substring(0, 2) + "/" + strDate.substring(2, 2) + "/" + strDate.substring(4);
+                            strTxnLine[iIndex] = String.format("%"+ iSpacesBeforeDate+'s',"") + String.format("%-"+strTempDate.length()+iSpacesAfterDate+"s",strTempDate);
+//                            strTxnLine[iIndex] = "".PadLeft(GlobalMembers.iSpacesBeforeDate) + strTempDate.PadRight(strTempDate.Length + GlobalMembers.iSpacesAfterDate, ' ');
+                            strTxnLine[iIndex] += strTempData.trim();
+                            strPrintData = strPrintData.substring(GlobalMembers.iNoOfByteInSingleLine);
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        Log.Write("Date value not correct in txn " + (iIndex + 1) );
+                        return false;
+                    }
+
+                    strErrorMsg = "Date read from " + iIndex + " location";
+
+                    //For SequenceNo
+                    if (strTxnLine[iIndex].length() >= 9)
+                    {
+                        //to hold trans id in array for sending in ACK
+                        strTransIdACK[iIndex] = strTxnLine[iIndex].substring(0, 9);
+
+                        //skip txn id as it is not used in printing
+                        strTxnLine[iIndex] = strTxnLine[iIndex].substring(9);
+                    }
+                    else
+                    {
+                        Log.Write("SequenceNo value not correct in txn " + (iIndex + 1));
+                        return false;
+                    }
+
+                    strErrorMsg = "SequenceNo skip from " + iIndex + " location";
+
+                    //For Getting the Transaction Type
+                    if (strTxnLine[iIndex].length() >= 8)
+                    {
+                        strDrCrIndicator = strTxnLine[iIndex].substring(0, 8).trim();
+                        strTxnLine[iIndex] = strTxnLine[iIndex].substring(8);
+                    }
+                    else
+                    {
+                        Log.Write("Transaction Type no value not correct in txn " + (iIndex + 1) );
+                        return false;
+                    }
+
+                    strErrorMsg = "Transaction Type no skip from " + iIndex + " location";
+
+
+                    //For txn value date
+                    if (strTxnLine[iIndex].length() >= 8)
+                    {
+                        strTxnLine[iIndex] = strTxnLine[iIndex].substring(8);
+                    }
+                    else
+                    {
+                        Log.Write("Txn value date value not correct in txn " + (iIndex + 1) );
+                        return false;
+                    }
+
+                    strErrorMsg = "Txn value date read from " + iIndex + " location";
+
+                    //For txn amount
+                    if (strTxnLine[iIndex].length() >= GlobalMembers.iDebitFieldSize)
+                    {
+                        strTxnAmnt = strTxnLine[iIndex].substring(0, GlobalMembers.iDebitFieldSize);
+                        strTxnLine[iIndex] = strTxnLine[iIndex].substring(GlobalMembers.iDebitFieldSize);
+                        if (strDrCrIndicator.equals("D"))
+                        {
+                            if (strDbAmnt.equals("") && !removeLeadingZeroes(strTxnAmnt).equals(".00"))
+                                strDbAmnt = strTxnAmnt;
+                        }
+                        else
+                        {
+                            if (strDbAmnt.equals("") && !removeLeadingZeroes(strTxnAmnt).equals(".00"))
+                                strCrAmnt = strTxnAmnt;
+                        }
+                    }
+                    else
+                    {
+                        Log.Write("Amnt value not correct in txn " + (iIndex + 1) );
+                        return false;
+                    }
+
+                    strErrorMsg = "Txn amount read from " + iIndex + " location";
+
+
+                    //For particulars
+                    if (strTxnLine[iIndex].length() >= GlobalMembers.iParticularSize)
+                    {
+                        strParticular = strTxnLine[iIndex].substring(0, GlobalMembers.iParticularSize);
+                        strTxnLine[iIndex] = strTxnLine[iIndex].substring(GlobalMembers.iParticularSize);
+                    }
+                    else
+                    {
+                        Log.Write("Particular value not correct in txn " + (iIndex + 1));
+                        return false;
+                    }
+
+                    strErrorMsg = "Particular read from " + iIndex + " location";
+
+
+                    //For txn posted date
+                    if (strTxnLine[iIndex].length() >= 8)
+                    {
+                        strTxnPostedDateACK[iIndex] = strTxnLine[iIndex].substring(0, 8);
+                        strTxnLine[iIndex] = strTxnLine[iIndex].substring(8);
+                    }
+                    else
+                    {
+                        Log.Write("Txn posted date value not correct in txn " + (iIndex + 1));
+                        return false;
+                    }
+
+                    strErrorMsg = "Txn posted date read from " + iIndex + " location";
+
+
+                    //For Skipping Filler
+                    if (strTxnLine[iIndex].length() >= 6)
+                    {
+                        //strTxnPostedDateACK[iIndex] = strTxnLine[iIndex].substring(0, 8);
+                        strTxnLine[iIndex] = strTxnLine[iIndex].substring(6);
+                    }
+                    else
+                    {
+                        Log.Write("Filler value not correct in txn " + (iIndex + 1));
+                        return false;
+                    }
+
+
+                    //For instrument no / Cheque no
+                    if (strTxnLine[iIndex].length() >= GlobalMembers.iChequeNoSize)
+                    {
+                        strChqNo = strTxnLine[iIndex].substring(0, GlobalMembers.iChequeNoSize);
+                        strTxnLine[iIndex] = strTxnLine[iIndex].substring(GlobalMembers.iChequeNoSize);
+                    }
+                    else
+                    {
+                        Log.Write("Cheque value not correct in txn " + (iIndex + 1));
+                        return false;
+                    }
+
+                    strErrorMsg = "Chq no read from " + iIndex + " location";
+
+                    //For end balance
+                    if (strTxnLine[iIndex].length() >= GlobalMembers.iEndBalanceFieldSize)
+                    {
+                        strEndBalance = strTxnLine[iIndex];
+                        strEndBalanceACK[iIndex] = strTxnLine[iIndex];
+
+                        if (strBFBalance.equals("") && !removeLeadingZeroes(strEndBalance).equals(".00")) //removeLeadingZeroes method removes the zeros from string
+                        {
+                            strBFBalance = strTxnLine[iIndex];
+//                            if (strDrCrIndicator.equals("C"))
+//                                strBFBalance = (Double.parseDouble(strBFBalance) - Double.parseDouble(strCrAmnt)).ToString("F").PadLeft(GlobalMembers.iCreditFieldSize, ' ');
+//                            else
+//                                strBFBalance = (Double.parseDouble(strBFBalance) + Double.parseDouble(strDbAmnt)).ToString("F").PadLeft(GlobalMembers.iDebitFieldSize, ' ');
+                        }
+
+                    }
+                    else
+                    {
+                        Log.Write("End balance value not correct in txn " + (iIndex + 1));
+                        return false;
+                    }
+
+                    strErrorMsg = "End balance read from " + iIndex + " location";
+
+                    //************************************************
+                    //start formatting actual printing data from here
+                    //************************************************
+                    if (strDate.length() == 8 && !strDate.equals("        "))
+                    {
+                        String strTempDate = strDate.substring(0, 2) + "/" + strDate.substring(2, 2) + "/" + strDate.substring(4);
+                        strTxnLine[iIndex] = String.format("%"+iSpacesBeforeDate+"s","") + String.format("%-"+strTempDate.length()+iSpacesAfterDate+"s",strTempDate);
+//                        strTxnLine[iIndex] = "".PadLeft(GlobalMembers.iSpacesBeforeDate) + strTempDate.PadRight(strTempDate.Length + GlobalMembers.iSpacesAfterDate, ' '); //V26.1.1.31
+                    }
+                    else
+                        strTxnLine[iIndex] = String.format("%-"+strDate.length()+iSpacesAfterDate+5+"s",strDate);
+//                        strTxnLine[iIndex] = strDate.PadRight(strDate.length() + GlobalMembers.iSpacesAfterDate + 5, ' ');
+
+                    strErrorMsg = "Date formatted from " + iIndex + " location";
+
+                    strParticular = strParticular.substring(0, 20);
+                    strTxnLine[iIndex] += String.format("%-"+strParticular.length()+iSpacesAfterParticular+"s",strParticular);
+//                    strTxnLine[iIndex] += strParticular.PadRight(strParticular.length() + GlobalMembers.iSpacesAfterParticular, ' ');
+
+                    strErrorMsg = "Particular formatted from " + iIndex + " location";
+
+
+
+                    //strChqNo = strChqNo.substring(10, 6);
+                    strTxnLine[iIndex] += String.format("%-"+strChqNo.length()+iSpacesAfterChequeNo+"s",strChqNo);
+//                    strTxnLine[iIndex] += strChqNo.PadRight(strChqNo.length() + GlobalMembers.iSpacesAfterChequeNo, ' ');
+                    strErrorMsg = "Chq no formatted from " + iIndex + " location";
+
+
+                    String strTempAmnt = "";
+
+                    if (strDrCrIndicator.equals("D"))
+                    {
+                        strTempAmnt = removeLeadingZeroes(strTxnAmnt);  //strTxnAmnt.TrimStart('0');
+                        if (strTempAmnt.equals(".00"))
+                            strTxnLine[iIndex] += String.format("%"+iDateFieldSize+"s","") + String.format("%-"+iSpacesAfterDebitAmount+"s","");
+//                            strTxnLine[iIndex] += "".PadLeft(GlobalMembers.iDebitFieldSize) + ("").PadRight(GlobalMembers.iSpacesAfterDebitAmount, ' ');
+                        else
+                            strTxnLine[iIndex] += String.format("%"+iDateFieldSize+"s",strTempAmnt) + String.format("%-"+iSpacesAfterDebitAmount+"s","");
+//                            strTxnLine[iIndex] += strTempAmnt.PadLeft(GlobalMembers.iDebitFieldSize) + ("").PadRight(GlobalMembers.iSpacesAfterDebitAmount, ' ');
+
+                        strTxnLine[iIndex] += String.format("%"+iCreditFieldSize+iSpacesAfterDebitAmount+"s","                  ");
+//                        strTxnLine[iIndex] += ("                  ").PadLeft(GlobalMembers.iCreditFieldSize + GlobalMembers.iSpacesAfterDebitAmount, ' ');
+                    }
+                    else
+                    {
+                        strTxnLine[iIndex] += String.format("%"+ iDateFieldSize+iSpacesAfterDebitAmount+"s","                  ");
+//                        strTxnLine[iIndex] += ("                  ").PadLeft(GlobalMembers.iDebitFieldSize + GlobalMembers.iSpacesAfterDebitAmount, ' ');
+                        strTempAmnt = removeLeadingZeroes(strTxnAmnt); //strTxnAmnt.TrimStart('0');
+                        if (strTempAmnt.equals(".00"))
+                            strTxnLine[iIndex] += String.format("%"+iCreditFieldSize+"s","") + String.format("%-"+ iSpacesAfterCreditAmount+"s","");
+//                            strTxnLine[iIndex] += "".PadLeft(GlobalMembers.iCreditFieldSize) + ("").PadRight(GlobalMembers.iSpacesAfterCreditAmount, ' ');
+                        else
+                            strTxnLine[iIndex] += String.format("%"+iCreditFieldSize+"s",strTempAmnt) + String.format("%-"+ iCreditFieldSize+"s"," ");
+//                            strTxnLine[iIndex] += strTempAmnt.PadLeft(GlobalMembers.iCreditFieldSize) + ("").PadRight(GlobalMembers.iSpacesAfterCreditAmount, ' ');
+                    }
+
+                    strErrorMsg = "Txn amount formated from " + iIndex + " location";
+
+//                    if (iIndex == 6)
+//                        iIndex = 6;
+
+                    strTempAmnt = "";
+                    strTempAmnt = removeLeadingZeroes(strEndBalance); //strEndBalance.TrimStart('0');
+                    if (strTempAmnt.equals(".00"))
+                        strTxnLine[iIndex] += String.format("%"+iEndBalanceFieldSize+1+"s","");
+//                        strTxnLine[iIndex] += "".PadLeft(GlobalMembers.iEndBalanceFieldSize + 1);
+                    else
+                    {
+//                        strTxnLine[iIndex] += strTempAmnt.PadLeft(GlobalMembers.iEndBalanceFieldSize + 1);
+                        strTxnLine[iIndex] += String.format("%"+iEndBalanceFieldSize+1+"s",strTempAmnt);
+                        if (strEndBalance.indexOf("-") > 0)
+                            strTxnLine[iIndex] += "Dr";
+                        else
+                            strTxnLine[iIndex] += "Cr";
+                    }
+
+                    strErrorMsg = "End balance formated from " + iIndex + " location";
+
+
+
+                    //Trim
+                    strPrintData = strPrintData.substring(GlobalMembers.iNoOfByteInSingleLine);
+                }
+
+                strErrorMsg = "All Txns parsed";
+
+                GlobalMembers.objLastTxnDetails.iLastLineNo = Integer.parseInt(strPrintData.substring(0, 2));
+            }
+
+
+            String strPrinterData = "";
+
+
+            //Add header if printing starts from line no 1, else add spce for header
+            if (GlobalMembers.objLastTxnDetails.iLastLineNo == 1)
+            {
+                GlobalMembers.bIsNewTransaction = false;
+                strPrinterData += "\r\n    DATE         PARTICULAR                     CHEQUE               AMT. DR               AMT. CR           BALANCE\r\n";
+                strPrinterData += "  ------------------------------------------------------------------------------------------------------------------------------\r\n";
+
+                if (!strBFBalance.equals("") && !strBFBalance.equals("                 "))
+                    strPrinterData += "                                                             Brought Forward     " + strBFBalance + ((strBFBalance.indexOf("-") > 0) ? "Dr" : "Cr") + "\r\n";
+                else
+                    strPrinterData += "\r\n";
+
+                strErrorMsg = "After adding header";
+            }
+            else
+            {
+                if (GlobalMembers.bIsNewTransaction)
+                {
+                    GlobalMembers.bIsNewTransaction = false;
+
+                    for (int i = 0; i < GlobalMembers.objACCOUNT_DETAILS.iExtra_Line_Feed; i++)
+                        strPrinterData += "\r\n";
+
+                    for (int iLineFeeds = 1; iLineFeeds < (GlobalMembers.objLastTxnDetails.iLastLineNo); iLineFeeds++)
+                        strPrinterData += "\r\n";
+
+                    strErrorMsg = "After adding header";
+                }
+            }
+
+            /*If no of txns came in reply can be printed on single page or not
+             * To check this add txns came in reply and starting line no and check if they are less than or equal to page limit
+             */
+            if (strTxnLine.length + GlobalMembers.objLastTxnDetails.iLastLineNo <= GlobalMembers.objACCOUNT_DETAILS.iMax_Line_To_Print)
+            {
+                strErrorMsg = "Single page data";
+
+                //loop through formatted txns array
+                int iDataLines = 0;
+                for (iDataLines = 0; iDataLines < strTxnLine.length; iDataLines++)
+                {
+                    if (iDataLines + Integer.parseInt(GlobalMembers.strTotalLinesPrinted) < strTxnLine.length && strTxnLine[iDataLines + Integer.parseInt(GlobalMembers.strTotalLinesPrinted)] != null)
+                    {
+                        //add txns in printer buffer
+                        strPrinterData += strTxnLine[iDataLines + Integer.parseInt(GlobalMembers.strTotalLinesPrinted)] + "\r\n";
+
+                        strErrorMsg = "Printing data added for " + iDataLines + " location";
+
+                        GlobalMembers.strTotalLinesToBePrinted = String.valueOf((iDataLines + Integer.parseInt(GlobalMembers.strTotalLinesPrinted) + 1));
+
+                        GlobalMembers.objPBAckDetails.strLastTransId = strTransIdACK[iDataLines];
+                        GlobalMembers.objPBAckDetails.strLastDate = strDateACK[iDataLines];
+                        GlobalMembers.objPBAckDetails.strLastTxnSerialNo = strTransSerialNoACK[iDataLines];
+
+                        //update last line no printed
+                        GlobalMembers.objPBAckDetails.strLastLinePrinted = String.valueOf(iDataLines);
+                    }
+                }
+
+                GlobalMembers.strTotalLinesPrinted = GlobalMembers.strTotalLinesToBePrinted;
+
+                //update total lines printed
+                GlobalMembers.objPBAckDetails.strLastLinePrinted = (Integer.parseInt(GlobalMembers.objPBAckDetails.strLastLinePrinted) + String.valueOf(GlobalMembers.objLastTxnDetails.iLastLineNo));
+            }
+            else
+            {
+                strErrorMsg = "Page turn required";
+                GlobalMembers.bMoreData = true;
+
+                for (int iDataLines = 0; iDataLines <= GlobalMembers.objACCOUNT_DETAILS.iMax_Line_To_Print - GlobalMembers.objLastTxnDetails.iLastLineNo; iDataLines++)
+                {
+                    //add txns in printer buffer
+                    strPrinterData += strTxnLine[iDataLines] + "\r\n";
+
+                    strErrorMsg = "Printing data added for " + iDataLines + " location";
+
+                    GlobalMembers.strLinesToPrint = String.valueOf(iDataLines);
+
+                    GlobalMembers.strTotalLinesPrinted = String.valueOf((iDataLines + 1));
+
+                    if (iDataLines < strTxnPostedDateACK.length)
+                    {
+                        GlobalMembers.objPBAckDetails.strTxnPostDate = strTxnPostedDateACK[iDataLines];
+                        GlobalMembers.objPBAckDetails.strEndBalance = strEndBalanceACK[iDataLines];
+
+//                        if (strEndBalanceACK[iDataLines].TrimStart('0') != ".00")
+                        if(!removeLeadingZeroes(strEndBalanceACK[iDataLines]).equals(".00"))
+                        {
+                            GlobalMembers.objPBAckDetails.strEndBalance = strEndBalanceACK[iDataLines];
+                            strBFBalance = String.format("%"+iEndBalanceFieldSize+"s",removeLeadingZeroes(strEndBalance));
+//                            strBFBalance = GlobalMembers.objPBAckDetails.strEndBalance.TrimStart('0').PadLeft(GlobalMembers.iEndBalanceFieldSize, ' ');
+                        }
+
+                        GlobalMembers.objPBAckDetails.strLastTransId = strTransIdACK[iDataLines];
+                        GlobalMembers.objPBAckDetails.strLastDate = strDateACK[iDataLines];
+                        GlobalMembers.objPBAckDetails.strLastTxnSerialNo = strTransSerialNoACK[iDataLines];
+
+                        //update last line no printed
+                        GlobalMembers.objPBAckDetails.strLastLinePrinted = String.valueOf(iDataLines);
+                    }
+                }
+
+                //update total lines printed
+                GlobalMembers.objPBAckDetails.strLastLinePrinted = (Integer.parseInt(GlobalMembers.objPBAckDetails.strLastLinePrinted) + String.format("%2s",GlobalMembers.objLastTxnDetails.iLastLineNo)); //GlobalMembers.objLastTxnDetails.iLastLineNo).PadLeft(2, ' ');
+                GlobalMembers.strTotalLinesToBePrinted = ((GlobalMembers.strTotalLinesPrinted) + GlobalMembers.objLastTxnDetails.iLastLineNo);
+            }
+
+            if (Integer.parseInt(GlobalMembers.strTotalLinesToBePrinted) >= GlobalMembers.objACCOUNT_DETAILS.iMax_Line_To_Print)
+            {
+                strPrinterData += "                                                             Carried Forward     " + String.format("%"+iEndBalanceFieldSize+"s",removeLeadingZeroes(strBFBalance)) + ((GlobalMembers.objPBAckDetails.strEndBalance.indexOf("-") > 0) ? "Dr" : "Cr") + "\r\n";
+//                strPrinterData += "                                                             Carried Forward     " + strBFBalance.TrimStart('0').PadLeft(GlobalMembers.iEndBalanceFieldSize, ' ') + ((GlobalMembers.objPBAckDetails.strEndBalance.indexOf("-") > 0) ? "Dr" : "Cr") + "\r\n";
+            }
+
+            strErrorMsg = "Printing data addition completed";
+
+            strComposedData = strPrinterData;
+
+            return true;
+        }
+        catch (Exception excp)
+        {
+            Log.Write("ComposePrintingData() Excp-" + excp.getMessage() + "; Error Msg- " + strErrorMsg );
+            return false;
+        }
+        finally
+        {
+            System.gc();
+        }
+    }
+
+    //this method is used for removing leading zeros from the string
+    public static String removeLeadingZeroes(String str) {
+        String strPattern = "^0+(?!$)";
+        str = str.replaceAll(strPattern, "");
+        return str;
     }
 }
 

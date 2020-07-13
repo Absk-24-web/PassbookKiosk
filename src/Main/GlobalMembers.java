@@ -41,7 +41,6 @@ public  class GlobalMembers {
     public static Wini objHealthIni = null;
     public static Wini objCnctnIni = null;
 
-    public static String strLogPath;
     public static String[] strMISPath;
     public static String strImagesPath;
     public static String strAudioPath;
@@ -50,7 +49,7 @@ public  class GlobalMembers {
     public static boolean bIsNewTransaction;
     public static Task objTaskState;
     public static Timer objTimer=null;
-    public static int errorCode;
+    public static int errorCode = 0;
 
     //client
     public static Socket client;
@@ -79,14 +78,8 @@ public  class GlobalMembers {
         PassbookCoverPageAckResponse,
         PassbookError,
         RequestTimeout,
-        InServiceMode
+        InMaintenanceMode
     }
-
-    enum ErrorType
-    {
-        None,
-    }
-
 
     public enum MsgLenType
     {
@@ -105,11 +98,9 @@ public  class GlobalMembers {
 
     public static class ISOFields
     {
-        //public String strDesc;
         public int iType;
         public int iLength;
         public String strValue;
-        //public boolean bVisible;
     }
 
     public static ISOFields[] objISO;
@@ -202,12 +193,6 @@ public  class GlobalMembers {
 
     public static String[] arEnglishScreenText = null;
     public static String[] arRegionalScreenText = null;
-
-    //thread for log writing
-    public static Thread thrdLogQueueCallback;
-
-    //thread for MIS writing
-    public static Thread thrdMISQueueCallback;
 
     //directory names for logs
     public static String LOGKPROC = "KPROC";
