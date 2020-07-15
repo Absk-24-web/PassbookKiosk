@@ -119,7 +119,7 @@ public class Timer implements Runnable {
                                 bThreadProtection = false;
                                 objTaskState = Task.AuthenticationRequest;
                             } else {
-                                //// TODO: 13-07-2020   printer
+                                // TODO: 13-07-2020   printer
 //                            if (GlobalMembers.bIsPassbookEpson == false)
 //                                Ollivtti_Obj.StartPassbookCheck();
 //                            else

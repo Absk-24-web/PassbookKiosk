@@ -95,7 +95,6 @@ public class Testing {
 
     public static byte[] ConvertHexToAscii(String strHex)
     {
-        // TODO: 13-07-2020  return fixed
         byte[] Asc = new byte[strHex.length() / 2];
         for (int i = 0; i < Asc.length; i++) {
             Asc[i] = (byte) Integer.parseInt(strHex.substring(i*2, i*2+2), 16);

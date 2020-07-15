@@ -642,7 +642,7 @@ public class Main extends JFrame {
                         //Added To resolve DNS and to get IP
                         if (GlobalMembers.objCBS.bIs_DNS)
                         {
-                            //Todo
+                            //Todo DNS
 //                            IPHostEntry hostInfo = Dns.GetHostEntry(GlobalMembers.objCBS.strHost_Name);
 //                            client = ScsClientFactory.CreateClient(new ScsTcpEndPoint(hostInfo.AddressList[0].ToString(), Convert.ToInt32(GlobalMembers.objCBS.strPort)));
                             Log.Write("CONNECTION VIA TCP/IP AND DNS IS ENABLED");
